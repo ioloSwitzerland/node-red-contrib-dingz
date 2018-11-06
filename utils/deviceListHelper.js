@@ -1,0 +1,85 @@
+var helpers = require('../utils/helpers')
+var requests = require('../utils/requests')
+module.exports = {
+
+  startDeviceListener: function(node) {
+    //Start listener if not already running
+    var listenerState = helpers.getListernerState()
+    if (!listenerState) {
+      this.deviceListener(node)
+    }
+  },
+
+  deviceListener: function(node) {
+    const dgram = require('dgram');
+    const server = dgram.createSocket('udp4');
+
+    helpers.setListenerState(true)
+
+    server.on('listening', () => {
+      const address = server.address();
+    });
+
+    server.on('message', (msg, rinfo) => {
+      var data = new Uint8Array(msg)
+
+      var macAddressParts = []
+      if (rinfo.size != 8) {
+        return
+      }
+
+      //iterate over bytes which are for mac => 6 (entire message size 8)
+      for (let byteIndex = 0; byteIndex < 6; byteIndex++) {
+        let macByte = data[byteIndex].toString(16)
+        if (macByte.length < 2) { //leading 0
+          macByte = '0' + macByte
+        }
+        macAddressParts[byteIndex] = macByte
+      }
+      //create device object here and append it to deviceList if not there yet
+      const mac = macAddressParts.join(':').toUpperCase()
+      const ip = rinfo.address
+      const type = helpers.numberToType(data[6])
+      const name = type.charAt(0).toUpperCase() + type.slice(1)
+
+      var device = {
+        'ip': ip,
+        'mac': mac,
+        'type': type,
+        'name': name
+      }
+      if (type == "dingz") {
+        requests.typeQuery(this.typeQueryCallback, device)
+      }
+
+
+    })
+
+    server.on('error', (err) => {
+      console.log(`server error:\n${err.stack}`);
+      server.close();
+    });
+
+    server.on('close', () => {
+      console.log('closed');
+    })
+
+    server.bind(7979);
+  },
+
+  typeQueryCallback: function(device) {
+
+    var deviceList = helpers.getDeviceList()
+    device.name += " " + (helpers.amountDevicesForType()[device.type] + 1);
+
+    var known = helpers.knownDevicesWithIP()
+    if (Object.keys(known).indexOf(device.mac) < 0) {
+      deviceList.push(device)
+      helpers.setDeviceList(deviceList)
+      console.log(`Discvoered: ${device.name}@${device.ip} with ${device.mac}`);
+      //TODO
+      //node.warn(`Discvoered: ${device.name}@${device.ip} with ${device.mac}`)
+    }
+  }
+
+};

@@ -1,0 +1,9 @@
+language:   node_js
+node_js:
+  - "node"
+deploy:
+  provider: npm
+  email:    p.m.hadjimina@gmail.com
+  api_key:  $AUTH
+  on:
+    repo:   dingz/node-red-contrib-dingz
