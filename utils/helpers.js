@@ -1,24 +1,28 @@
-var typeList = ["dingzone", "dingzoneplus"]
-var http = require('http');
-var buttonInteractions = ["single", "double", "long"]
-var deviceList = [] //array of mac addresses which are already registerType
-var nodeForMac = []
-var listenerState = false
+var typeList = ["dingz"];
+var buttonTypes = 4;
+var buttonInteractions = ["single", "double", "long"];
+var deviceList = []; //array of mac addresses which are already registerType
+var nodeForMac = [];
+var listenerState = false;
+var macNameList;
 
 module.exports = {
+  getNumberOfButtons: function() {
+    return numberOfButtons;
+  },
   insert: function(str, index, value) {
     return str.substr(0, index) + value + str.substr(index);
   },
 
   getHostIp: function() {
-    var os = require('os');
+    var os = require("os");
     var networkInterfaces = os.networkInterfaces();
 
     for (var key of Object.keys(networkInterfaces)) {
       for (var i = 0; i < networkInterfaces[key].length; i++) {
-        var iface = networkInterfaces[key][i]
-        if (iface.family == 'IPv4' && iface.mac != '00:00:00:00:00:00') {
-          return iface.address
+        var iface = networkInterfaces[key][i];
+        if (iface.family == "IPv4" && iface.mac != "00:00:00:00:00:00") {
+          return iface.address;
         }
       }
     }
@@ -26,164 +30,281 @@ module.exports = {
 
   setupWiredListFromJSON: function(taskJSON, node) {
     //get actions array for wiredList
-    var actions = [taskJSON.data.single['url'], taskJSON.data.double['url'], taskJSON.data.long['url'], taskJSON.data.touch['url']]
+    var actions = [
+      taskJSON.data.single.url,
+      taskJSON.data.double.url,
+      taskJSON.data.long.url
+    ];
+
     actions = actions.map((value, index, array) => {
-      return value == "wire"
-    })
+      return value == "wire";
+    });
 
     //Set button from wiredlist
-    var buttonList = this.getWiredList()
-    var i = 0
+    var buttonList = this.getWiredList();
+    var i = 0;
     for (i; i < buttonList.length; i++) {
       if (buttonList[i].nodeID == node.id) {
-        buttonList[i].actions = actions
-        buttonList[i].mac = taskJSON.mac
-        break
+        buttonList[i].actions = actions;
+        buttonList[i].mac = taskJSON.mac;
+        break;
       } else if (buttonList[i].mac == taskJSON.mac) {
-        buttonList[i].actions = actions
-        buttonList[i].nodeID = node.id
-        break
+        buttonList[i].actions = actions;
+        buttonList[i].nodeID = node.id;
+        break;
       }
     }
 
     //if does not already exist (i.e. loop iterated until end)
     if (i == buttonList.length || (i == 0 && buttonList.length == 0)) {
-      buttonList.push({ 'mac': taskJSON.mac, 'nodeID': node.id, 'actions': actions })
+      buttonList.push({
+        mac: taskJSON.mac,
+        nodeID: node.id,
+        actions: actions
+      });
     }
 
-    this.setWiredList(buttonList)
-
+    this.setWiredList(buttonList);
   },
   setupNodeMacPairs: function(node) {
-    var buttonList = this.getWiredList()
+    var buttonList = this.getWiredList();
     for (var i = 0; i < buttonList.length; i++) {
       if (buttonList[i].nodeID == node.id) {
-        var nodeForMacTmp = nodeForMac
-        nodeForMacTmp[buttonList[i].mac] = node
-        nodeForMac = nodeForMacTmp
+        var nodeForMacTmp = nodeForMac;
+        nodeForMacTmp[buttonList[i].mac] = node;
+        nodeForMac = nodeForMacTmp;
       }
     }
   },
   setNodeForMac: function(list) {
-    nodeForMac = list
+    nodeForMac = list;
   },
   getNodeForMac: function() {
-    return nodeForMac
+    return nodeForMac;
   },
   getWiredList: function() {
-    fs = require('fs');
-    var data
-    var path = __dirname + '/wiredlist.json'
+    fs = require("fs");
+    var data;
+    var path = __dirname + "/wiredlist.json";
     if (fs.existsSync(path)) {
-      data = JSON.parse(fs.readFileSync(path, 'utf8'))
+      data = JSON.parse(fs.readFileSync(path, "utf8"));
     } else {
-      data = []
+      data = [];
     }
-    return data
+    return data;
   },
 
   setWiredList: function(list) {
-    fs = require('fs');
-    var path = __dirname + '/wiredlist.json'
-    fs.writeFileSync(path, JSON.stringify(list), function(err) {
-      if (err) return console.log(err);
-    });
+    fs = require("fs");
+    var path = __dirname + "/wiredlist.json";
+
+    try {
+      fs.writeFileSync(path, JSON.stringify(list));
+    } catch (err) {
+      console.log("Error writing Metadata.json:" + err.message);
+    }
+  },
+
+  setMacNameList: function(list) {
+    macNameList = list;
+    fs = require("fs");
+    var path = __dirname + "/macnamelist.json";
+
+    try {
+      fs.writeFileSync(path, JSON.stringify(list));
+    } catch (err) {
+      console.log("Error writing Metadata.json:" + err.message);
+    }
   },
   getListernerState: function() {
     return listenerState;
   },
   setListenerState: function(state) {
-    listenerState = state
+    listenerState = state;
   },
   getDeviceList: function() {
-    return deviceList
+    if (deviceList == null) {
+      fs = require("fs");
+      var data;
+      var path = __dirname + "/deviceList.json";
+      if (fs.existsSync(path)) {
+        data = JSON.parse(fs.readFileSync(path, "utf8"));
+      } else {
+        data = [];
+      }
+      macNameList = data;
+    }
+    return deviceList;
   },
 
   setDeviceList: function(list) {
-    deviceList = list
+    deviceList = list;
+    fs = require("fs");
+    var path = __dirname + "/deviceList.json";
+
+    try {
+      fs.writeFileSync(path, JSON.stringify(list));
+    } catch (err) {
+      console.log("Error writing Metadata.json:" + err.message);
+    }
   },
 
   //validity has to be checked beforehand
   getPathAndData: function(type, taskJSON, node) {
-    ip = taskJSON["ip"]
-    mac = taskJSON["mac"]
-    request = taskJSON["request"]
-    data = taskJSON["data"]
+    var sendHackFlag = true;
 
-    var resolvedPath = ""
-    var resolvedData = ""
+    ip = taskJSON["ip"];
+    mac = taskJSON["mac"];
+    request = taskJSON["request"];
+    data = taskJSON["data"];
 
-    //TODO
-    return [resolvedPath, resolvedData]
+    var resolvedPath = "";
+    var resolvedData = "";
+
+    if (type == "dingz") {
+      if (request == "report") {
+        //NO DATA SENT
+        //TODO CHANGE URL
+        resolvedPath += "/info";
+      } else if (request == "set") {
+        var settingURLs = [];
+
+        for (var action of buttonInteractions) {
+          var currentURL = "";
+          var errorFlag = false;
+
+          if (data.hasOwnProperty(action) && data[action]["url"].length > 0) {
+            if (data[action]["url"] != "wire") {
+              var current = data[action];
+              var url = current["url"];
+              currentURL = "get://" + url;
+
+              if (
+                current.hasOwnProperty("url-data") &&
+                current["url-data"].length > 0
+              ) {
+                var urlData = current["url-data"];
+                //replace = with %3D
+                if (!sendHackFlag) {
+                  urlData = urlData.replace(/=/g, "%3D");
+                  urlData = urlData.replace(/&/g, "%26");
+                }
+
+                //replace & with %26
+
+                currentURL = "post://" + url + "?" + urlData;
+              }
+            } else {
+              //CHANGE MIDDLE IP
+
+              var offSet = data.hasOwnProperty("urlOffset")
+                ? data["urlOffset"]
+                : ":1880";
+
+              //TODO change this
+
+              if (sendHackFlag) {
+                currentURL =
+                  "post://" +
+                  this.getHostIp() +
+                  offSet +
+                  "/dingzInput?mac=" +
+                  mac.toUpperCase() +
+                  "&action=" +
+                  buttonInteractions.indexOf(action);
+              } else {
+                currentURL =
+                  "post://" +
+                  this.getHostIp() +
+                  offSet +
+                  "/dingzInput?mac%3D" +
+                  mac.toUpperCase() +
+                  "%26action%3D" +
+                  buttonInteractions.indexOf(action);
+              }
+            }
+            var url = action + "=" + currentURL;
+            settingURLs.push(url);
+          }
+        }
+        resolvedData = settingURLs;
+
+        //TODO change to not only 1 button
+        resolvedPath += "/api/v1/action/btn1";
+      }
+    }
+
+    return [resolvedPath, resolvedData];
   },
 
+  //TODO CORRECT ERROR HANDLING
   messageToJson: function(resp) {
     var ret;
-    if (resp != '') {
-      ret = { success: "true", response: resp };
+    if (resp != "") {
+      ret = {
+        success: "true",
+        response: resp
+      };
     } else {
-      ret = { success: "false", response: "" };
+      ret = {
+        success: "success",
+        response: resp
+      };
     }
-    return ret
+    return ret;
   },
 
-  numberToType: function(number, ip) {
-
+  numberToType: function(number) {
     switch (number) {
       case 108:
-        return "dingz"
+        return "dingz"; //v1
         break;
       default:
-        return "unkown"
+        return "unknown";
     }
   },
 
-
   amountDevicesForType: function() {
-    var amount = new Array(typeList.length).fill(0) //amount of devices
+    //TODO change this line in mystrom
+    var amount = new Array(typeList.length).fill(0); //amount of devices
 
     if (deviceList) {
       for (let i = 0; i < deviceList.length; i++) {
-        var obj = deviceList[i]
-        var index = typeList.indexOf(obj.type)
+        var obj = deviceList[i];
+        var index = typeList.indexOf(obj.type);
         if (index >= 0) {
-          amount[index]++
+          amount[index]++;
         }
       }
     }
 
-    return zipToObject(typeList, amount)
-
+    return zipToObject(typeList, amount);
   },
-
-  knownDevicesWithIP: function() {
-    var macList = []
-    var ipList = []
-    for (var i of deviceList) {
-      macList.push(i.mac)
-      ipList.push(i.ip)
+  getDevice: function(mac) {
+    for (var device of deviceList) {
+      if (device.mac == mac) {
+        return device;
+      }
     }
-    return zipToObject(macList, ipList)
+    return null;
   }
 };
-
 
 function zipToObject(a, b) {
   if (a.length != b.length) {
     console.log("NOT SAME LENGTH");
-    return
-
+    return;
   }
 
-  var object = {}
+  var object = {};
   for (var i = 0; i < a.length; i++) {
-    object[a[i]] = b[i]
+    object[a[i]] = b[i];
   }
 
-  return object
+  return object;
 }
 
 function formatMac(mac) {
-  mac = mac.replace(/:/g, '');
+  mac = mac.replace(/:/g, "");
   return mac.toUpperCase();
 }

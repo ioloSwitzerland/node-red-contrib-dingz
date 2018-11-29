@@ -1,27 +1,38 @@
 {
   "name": "node-red-contrib-dingz",
-  "version": "0.1.0",
-  "description": "dingz  nodes to controll all dingz devices within Node-RED",
+  "version": "0.0.1",
+  "description": "dingz nodes to controll all dingz devices within Node-RED",
   "author": "Hadjimina",
-  "homepage": "https://github.com/dingz/node-red-contrib-dingz",
+  "homepage": "https://github.com/myStrom/node-red-contrib-mystrom",
   "license": "Apache-2.0",
   "maintainers": [
     "Philipp Hadjimina <p.m.hadjimina@gmail.com>"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/dingz/node-red-contrib-dingz.git"
+    "url": "https://github.com/myStrom/node-red-contrib-mystrom.git"
   },
   "bugs": {
-    "url": "https://github.com/dingz/node-red-contrib-dingz/issues"
+    "url": "https://github.com/myStrom/node-red-contrib-mystrom/issues"
   },
-  "dependencies": {
-  },
-  "keywords": ["node-red","node-red-contrib", "contrib", "mystrom", "iot","bulb", "switch", "strip","swisscom", "api", "dingz", "button", "pir","shade"],
+  "dependencies": {},
+  "keywords": [
+    "node-red",
+    "node-red-contrib",
+    "contrib",
+    "dingz",
+    "iot",
+    "bulb",
+    "switch",
+    "strip",
+    "swisscom",
+    "api",
+    "mystrom"
+  ],
   "node-red": {
     "nodes": {
-      "dingz one": "src/dingzOneInput.js",
-      "dingz Config one": "src/dingzConfigOne.js"
+      "dingz Input": "src/dingzInput.js",
+      "dingz Config ": "src/dingzConfig.js"
     }
   }
 }

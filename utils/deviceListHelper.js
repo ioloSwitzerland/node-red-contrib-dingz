@@ -1,85 +1,87 @@
-var helpers = require('../utils/helpers')
-var requests = require('../utils/requests')
-module.exports = {
+var helpers = require("../utils/helpers");
 
+module.exports = {
   startDeviceListener: function(node) {
     //Start listener if not already running
-    var listenerState = helpers.getListernerState()
+    var listenerState = helpers.getListernerState();
     if (!listenerState) {
-      this.deviceListener(node)
+      this.deviceListener(node);
     }
   },
 
   deviceListener: function(node) {
-    const dgram = require('dgram');
-    const server = dgram.createSocket('udp4');
+    const dgram = require("dgram");
+    const server = dgram.createSocket("udp4");
 
-    helpers.setListenerState(true)
+    helpers.setListenerState(true);
+    var deviceList = helpers.getDeviceList();
 
-    server.on('listening', () => {
+    server.on("listening", () => {
       const address = server.address();
     });
 
-    server.on('message', (msg, rinfo) => {
-      var data = new Uint8Array(msg)
+    server.on("message", (msg, rinfo) => {
+      var data = new Uint8Array(msg);
 
-      var macAddressParts = []
+      var macAddressParts = [];
       if (rinfo.size != 8) {
-        return
+        return;
       }
 
       //iterate over bytes which are for mac => 6 (entire message size 8)
       for (let byteIndex = 0; byteIndex < 6; byteIndex++) {
-        let macByte = data[byteIndex].toString(16)
-        if (macByte.length < 2) { //leading 0
-          macByte = '0' + macByte
+        let macByte = data[byteIndex].toString(16);
+        if (macByte.length < 2) {
+          //leading 0
+          macByte = "0" + macByte;
         }
-        macAddressParts[byteIndex] = macByte
+        macAddressParts[byteIndex] = macByte;
       }
       //create device object here and append it to deviceList if not there yet
-      const mac = macAddressParts.join(':').toUpperCase()
-      const ip = rinfo.address
-      const type = helpers.numberToType(data[6])
-      const name = type.charAt(0).toUpperCase() + type.slice(1)
+      const mac = macAddressParts.join(":").toUpperCase();
+      const ip = rinfo.address;
+      const type = helpers.numberToType(data[6]);
+      //TODO add to mystrom skill
+      if (type == "unknown") {
+        return;
+      }
+
+      var name = "";
+      if (helpers.getDevice(mac) == null) {
+        name =
+          type.charAt(0).toUpperCase() +
+          type.slice(1) +
+          " " +
+          (helpers.amountDevicesForType()[type] + 1);
+      } else {
+        name = helpers.getDevice(mac).name;
+      }
 
       var device = {
-        'ip': ip,
-        'mac': mac,
-        'type': type,
-        'name': name
+        ip: ip,
+        mac: mac,
+        type: type,
+        name: name
+      };
+
+      if (helpers.getDevice(mac) == null) {
+        deviceList.push(device);
+        helpers.setDeviceList(deviceList);
+        if (typeof node != undefined) {
+          // node.warn(`Discovered: ${name}@${ip} with ${mac}`);
+        }
       }
-      if (type == "dingz") {
-        requests.typeQuery(this.typeQueryCallback, device)
-      }
+    });
 
-
-    })
-
-    server.on('error', (err) => {
+    server.on("error", err => {
       console.log(`server error:\n${err.stack}`);
       server.close();
     });
 
-    server.on('close', () => {
-      console.log('closed');
-    })
+    server.on("close", () => {
+      console.log("closed");
+    });
 
     server.bind(7979);
-  },
-
-  typeQueryCallback: function(device) {
-
-    var deviceList = helpers.getDeviceList()
-    device.name += " " + (helpers.amountDevicesForType()[device.type] + 1);
-
-    var known = helpers.knownDevicesWithIP()
-    if (Object.keys(known).indexOf(device.mac) < 0) {
-      deviceList.push(device)
-      helpers.setDeviceList(deviceList)
-      console.log(`Discvoered: ${device.name}@${device.ip} with ${device.mac}`);
-      //TODO
-      //node.warn(`Discvoered: ${device.name}@${device.ip} with ${device.mac}`)
-    }
   }
-
 };

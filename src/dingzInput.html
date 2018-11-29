@@ -1,0 +1,483 @@
+<script type="text/javascript">
+  RED.nodes.registerType('dingz Input', {
+    category: 'dingz ',
+    color: '#6eb9cc',
+    defaults: {
+      name: {
+        value: ""
+      },
+      request: {
+        value: "",
+        required: true
+      },
+      device: {
+        value: "",
+        type: "dingz Config",
+        required: true
+      },
+      advanced: {
+        value: false,
+      },
+      singleURLFirst: {
+        value: ""
+      },
+      singleDataFirst: {
+        value: ""
+      },
+      doubleURLFirst: {
+        value: ""
+      },
+      doubleDataFirst: {
+        value: ""
+      },
+      longURLFirst: {
+        value: ""
+      },
+      longDataFirst: {
+        value: ""
+      },
+      singleURLSecond: {
+        value: ""
+      },
+      singleDataSecond: {
+        value: ""
+      },
+      doubleURLSecond: {
+        value: ""
+      },
+      doubleDataSecond: {
+        value: ""
+      },
+      longURLSecond: {
+        value: ""
+      },
+      longDataSecond: {
+        value: ""
+      },
+      singleURLThird: {
+        value: ""
+      },
+      singleDataThird: {
+        value: ""
+      },
+      doubleURLThird: {
+        value: ""
+      },
+      doubleDataThird: {
+        value: ""
+      },
+      longURLThird: {
+        value: ""
+      },
+      longDataThird: {
+        value: ""
+      },
+
+      singleURLForth: {
+        value: ""
+      },
+      singleDataForth: {
+        value: ""
+      },
+      doubleURLForth: {
+        value: ""
+      },
+      doubleDataForth: {
+        value: ""
+      },
+      longURLForth: {
+        value: ""
+      },
+      longDataForth: {
+        value: ""
+      },
+
+    },
+    outputLabels: ["Report asdf", "Long click output"],
+    inputs: 0,
+    outputs: 4,
+    icon: "myStrom-Button.png",
+    label: function() {
+      return this.name || "dingz Input";
+    },
+    oneditprepare: function() {
+      //Overall
+      $('#node-input-advanced').change(function() {
+        if (this.checked) {
+          $('#node-input-advanced-config').show()
+        } else {
+          $('#node-input-advanced-config').hide()
+        }
+
+        $('#node-input-advanced').val(this.checked);
+      });
+
+      //First
+      $('#node-input-show-first').change(function() {
+        if (this.checked) {
+          $('#node-input-advanced-config-first').show()
+        } else {
+          $('#node-input-advanced-config-first').hide()
+        }
+
+        $('#node-input-show-first').val(this.checked);
+      });
+
+      //second
+      $('#node-input-show-second').change(function() {
+        if (this.checked) {
+          $('#node-input-advanced-config-second').show()
+        } else {
+          $('#node-input-advanced-config-second').hide()
+        }
+
+        $('#node-input-show-second').val(this.checked);
+      });
+
+      //third
+      $('#node-input-show-third').change(function() {
+        if (this.checked) {
+          $('#node-input-advanced-config-third').show()
+        } else {
+          $('#node-input-advanced-config-third').hide()
+        }
+
+        $('#node-input-show-third').val(this.checked);
+      });
+
+      //forth
+      $('#node-input-show-forth').change(function() {
+        if (this.checked) {
+          $('#node-input-advanced-config-forth').show()
+        } else {
+          $('#node-input-advanced-config-forth').hide()
+        }
+
+        $('#node-input-show-forth').val(this.checked);
+      });
+
+
+
+      $('#node-input-advanced-config').hide()
+      $('#node-input-advanced-config-first').hide()
+      $('#node-input-advanced-config-second').hide()
+      $('#node-input-advanced-config-third').hide()
+      $('#node-input-advanced-config-forth').hide()
+    },
+    button: {
+      enabled: function() {
+        return !this.changed
+      },
+      onclick: function() {
+        var node = this;
+        var label = (this.name);
+        $.ajax({
+          url: "inject/" + this.id,
+          type: "POST",
+          success: function(resp) {
+
+            RED.notify(node._("dingz configuration uploaded", {
+              label: label
+            }), "success");
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status == 404) {
+              RED.notify(node._("common.notification.error", {
+                message: node._("common.notification.errors.not-deployed")
+              }), "error");
+            } else if (jqXHR.status == 500) {
+              RED.notify(node._("common.notification.error", {
+                message: node._("inject.errors.failed")
+              }), "error");
+            } else if (jqXHR.status == 0) {
+              RED.notify(node._("common.notification.error", {
+                message: node._("common.notification.errors.no-response")
+              }), "error");
+            } else {
+              RED.notify(node._("common.notification.error", {
+                message: node._("common.notification.errors.unexpected", {
+                  status: jqXHR.status,
+                  message: textStatus
+                })
+              }), "error");
+            }
+          }
+        });
+      }
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="dingz Input">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name"></i>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-device"><i class="fa fa-toggle-on"></i> Device</label>
+    <input id="node-input-device">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-request"><i class="fa fa-paper-plane"></i> Request</label>
+    <select type="text" id="node-input-request" onchange="requestChange(value)">
+      <option value="set" selected>Set dingz action</option>
+      <option value="report">Report</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-advanced"><i class="fa fa-cog"></i> <span>Config</span></label>
+    <label for="node-input-advanced" style="width:70%">
+          <input type="checkbox" id="node-input-advanced" style="display:inline-block; width:22px; vertical-align:baseline;"/><span>Enable advanced configuration</span>
+      </label>
+  </div>
+
+
+  //TODO BUGGY
+
+  <div id="node-input-advanced-config">
+
+    <div class="form-row">
+      <label for="node-input-advanced"><i class="fa fa-square"></i> <span>Buttons</span></label>
+      <label for="node-input-advanced" style="width:70%">
+            <input type="checkbox" id="node-input-show-first" style="display:inline-block; width:22px; vertical-align:baseline;"><span>First</span>
+            <input type="checkbox" id="node-input-show-second" style="display:inline-block; width:22px; vertical-align:baseline;"><span>Second</span>
+            <input type="checkbox" id="node-input-show-third" style="display:inline-block; width:22px; vertical-align:baseline;"><span>Third</span>
+            <input type="checkbox" id="node-input-show-forth" style="display:inline-block; width:22px; vertical-align:baseline;"><span>Forth</span>
+        </label>
+    </div>
+
+    <!--FIRST-->
+    <div id="node-input-advanced-config-first">
+      <h4>Button 1</h4>
+      <h5> Single Click</h5>
+      <div class="form-row">
+        <div class="inline">
+          <div>
+            Data:
+            <input type="text" id="node-input-singleDataFirst" placeholder="key=value&...">
+          </div>
+          <div>
+            Address:
+            <input type="text" id="node-input-singleURLFirst" placeholder="192.168..../wire" style="padding-left:10px">
+          </div>
+        </div>
+      </div>
+
+      <h5> Double Click</h5>
+      <div class="form-row">
+        <div class="inline">
+          <div>
+            Data:
+            <input type="text" id="node-input-doubleDataFirst" placeholder="key=value&...">
+          </div>
+          <div>
+            Address:
+            <input type="text" id="node-input-doubleURLFirst" placeholder="192.168..../wire" style="padding-left:10px">
+          </div>
+        </div>
+      </div>
+
+      <h5> Long Click</h5>
+      <div class="form-row">
+        <div class="inline">
+          <div>
+            Data:
+            <input type="text" id="node-input-longDataFirst" placeholder="key=value&...">
+          </div>
+          <div>
+            Address:
+            <input type="text" id="node-input-longURLFirst" placeholder="192.168..../wire" style="padding-left:10px">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--SECOND-->
+    <div id="node-input-advanced-config-second">
+      <h4>Button 2</h4>
+      <h5> Single Click</h5>
+      <div class="form-row">
+        <div class="inline">
+          <div>
+            Data:
+            <input type="text" id="node-input-singleDataSecond" placeholder="key=value&...">
+          </div>
+          <div>
+            Address:
+            <input type="text" id="node-input-singleURLSecond" placeholder="192.168..../wire" style="padding-left:10px">
+          </div>
+        </div>
+      </div>
+
+      <h5> Double Click</h5>
+      <div class="form-row">
+        <div class="inline">
+          <div>
+            Data:
+            <input type="text" id="node-input-doubleDataSecond" placeholder="key=value&...">
+          </div>
+          <div>
+            Address:
+            <input type="text" id="node-input-doubleURLSecond" placeholder="192.168..../wire" style="padding-left:10px">
+          </div>
+        </div>
+      </div>
+
+      <h5> Long Click</h5>
+      <div class="form-row">
+        <div class="inline">
+          <div>
+            Data:
+            <input type="text" id="node-input-longDataSecond" placeholder="key=value&...">
+          </div>
+          <div>
+            Address:
+            <input type="text" id="node-input-longURLSecond" placeholder="192.168..../wire" style="padding-left:10px">
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!--THIRD-->
+    <div id="node-input-advanced-config-third">
+      <h4>Button 3</h4>
+      <h5> Single Click</h5>
+      <div class="form-row">
+        <div class="inline">
+          <div>
+            Data:
+            <input type="text" id="node-input-singleDataThird" placeholder="key=value&...">
+          </div>
+          <div>
+            Address:
+            <input type="text" id="node-input-singleURLThird" placeholder="192.168..../wire" style="padding-left:10px">
+          </div>
+        </div>
+      </div>
+
+      <h5> Double Click</h5>
+      <div class="form-row">
+        <div class="inline">
+          <div>
+            Data:
+            <input type="text" id="node-input-doubleDataThird" placeholder="key=value&...">
+          </div>
+          <div>
+            Address:
+            <input type="text" id="node-input-doubleURLThird" placeholder="192.168..../wire" style="padding-left:10px">
+          </div>
+        </div>
+      </div>
+
+      <h5> Long Click</h5>
+      <div class="form-row">
+        <div class="inline">
+          <div>
+            Data:
+            <input type="text" id="node-input-longDataThird" placeholder="key=value&...">
+          </div>
+          <div>
+            Address:
+            <input type="text" id="node-input-longURLThird" placeholder="192.168..../wire" style="padding-left:10px">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--FORTH-->
+    <div id="node-input-advanced-config-forth">
+      <h4>Button 4</h4>
+      <h5> Single Click</h5>
+      <div class="form-row">
+        <div class="inline">
+          <div>
+            Data:
+            <input type="text" id="node-input-singleDataForth" placeholder="key=value&...">
+          </div>
+          <div>
+            Address:
+            <input type="text" id="node-input-singleURLForth" placeholder="192.168..../wire" style="padding-left:10px">
+          </div>
+        </div>
+      </div>
+
+      <h5> Double Click</h5>
+      <div class="form-row">
+        <div class="inline">
+          <div>
+            Data:
+            <input type="text" id="node-input-doubleDataForth" placeholder="key=value&...">
+          </div>
+          <div>
+            Address:
+            <input type="text" id="node-input-doubleURLForth" placeholder="192.168..../wire" style="padding-left:10px">
+          </div>
+        </div>
+      </div>
+
+      <h5> Long Click</h5>
+      <div class="form-row">
+        <div class="inline">
+          <div>
+            Data:
+            <input type="text" id="node-input-longDataForth" placeholder="key=value&...">
+          </div>
+          <div>
+            Address:
+            <input type="text" id="node-input-longURLForth" placeholder="192.168..../wire" style="padding-left:10px">
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+  </div>
+
+</script>
+
+<style>
+  input {
+    width: 100%;
+    display: block;
+  }
+
+  div.inline {
+    width: 100%;
+    display: table;
+  }
+
+  div.inline div {
+    display: table-cell;
+  }
+
+  div.inline div:nth-child(n+2) {}
+</style>
+
+
+<script>
+  function requestChange(value) {
+    var actions = ["single", "double", "long", "touch"]
+    var actionsData = ["URL ", "Data "]
+
+    var elements = document.getElementsByClassName("inline");
+
+    for (var i = 0; i < elements.length; i++) {
+      for (var input of elements[i].getElementsByTagName('input')) {
+        //Disable if equal to report
+        var disable = value != "set"
+        input.disabled = disable
+      }
+
+    }
+  }
+</script>
+
+
+<script type="text/x-red " data-help-name="myStrom Button">
+  NONE
+</script>
