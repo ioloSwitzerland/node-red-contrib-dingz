@@ -1,5 +1,6 @@
 var typeList = ["dingz"];
 var buttonTypes = 4;
+var buttonText = ["First", "Second", "Third", "Forth"];
 var buttonInteractions = ["single", "double", "long"];
 var deviceList = []; //array of mac addresses which are already registerType
 var nodeForMac = [];
@@ -7,8 +8,14 @@ var listenerState = false;
 var macNameList;
 
 module.exports = {
-  getNumberOfButtons: function() {
-    return numberOfButtons;
+  getButtonInteractions: function() {
+    return buttonInteractions;
+  },
+  getButtonTexts: function() {
+    return buttonText;
+  },
+  getNumberOfInputs: function() {
+    return buttonText.length;
   },
   insert: function(str, index, value) {
     return str.substr(0, index) + value + str.substr(index);
@@ -30,15 +37,20 @@ module.exports = {
 
   setupWiredListFromJSON: function(taskJSON, node) {
     //get actions array for wiredList
-    var actions = [
-      taskJSON.data.single.url,
-      taskJSON.data.double.url,
-      taskJSON.data.long.url
-    ];
 
-    actions = actions.map((value, index, array) => {
-      return value == "wire";
-    });
+    var actions = [];
+
+    for (var i = 0; i < buttonText.length; i++) {
+      var temp = [];
+
+      for (var j = 0; j < buttonInteractions.length; j++) {
+        temp.push(
+          taskJSON.data[i.toString()][buttonInteractions[j]].url == "wire"
+        );
+      }
+
+      actions.push(temp);
+    }
 
     //Set button from wiredlist
     var buttonList = this.getWiredList();
@@ -169,68 +181,80 @@ module.exports = {
       } else if (request == "set") {
         var settingURLs = [];
 
-        for (var action of buttonInteractions) {
-          var currentURL = "";
-          var errorFlag = false;
+        for (var i = 0; i < buttonText.length; i++) {
+          var settingButton = [];
+          for (var action of buttonInteractions) {
+            var currentURL = "";
+            var errorFlag = false;
 
-          if (data.hasOwnProperty(action) && data[action]["url"].length > 0) {
-            if (data[action]["url"] != "wire") {
-              var current = data[action];
-              var url = current["url"];
-              currentURL = "get://" + url;
+            if (
+              data[i.toString()].hasOwnProperty(action) &&
+              data[i.toString()][action]["url"].length > 0
+            ) {
+              if (data[i.toString()][action]["url"] != "wire") {
+                var current = data[i.toString()][action];
+                var url = current["url"];
+                currentURL = "get://" + url;
 
-              if (
-                current.hasOwnProperty("url-data") &&
-                current["url-data"].length > 0
-              ) {
-                var urlData = current["url-data"];
-                //replace = with %3D
-                if (!sendHackFlag) {
-                  urlData = urlData.replace(/=/g, "%3D");
-                  urlData = urlData.replace(/&/g, "%26");
+                if (
+                  current.hasOwnProperty("url-data") &&
+                  current["url-data"].length > 0
+                ) {
+                  var urlData = current["url-data"];
+                  //replace = with %3D
+                  if (!sendHackFlag) {
+                    urlData = urlData.replace(/=/g, "%3D");
+                    urlData = urlData.replace(/&/g, "%26");
+                  }
+
+                  //replace & with %26
+
+                  currentURL = "post://" + url + "?" + urlData;
                 }
-
-                //replace & with %26
-
-                currentURL = "post://" + url + "?" + urlData;
-              }
-            } else {
-              //CHANGE MIDDLE IP
-
-              var offSet = data.hasOwnProperty("urlOffset")
-                ? data["urlOffset"]
-                : ":1880";
-
-              //TODO change this
-
-              if (sendHackFlag) {
-                currentURL =
-                  "post://" +
-                  this.getHostIp() +
-                  offSet +
-                  "/dingzInput?mac=" +
-                  mac.toUpperCase() +
-                  "&action=" +
-                  buttonInteractions.indexOf(action);
               } else {
-                currentURL =
-                  "post://" +
-                  this.getHostIp() +
-                  offSet +
-                  "/dingzInput?mac%3D" +
-                  mac.toUpperCase() +
-                  "%26action%3D" +
-                  buttonInteractions.indexOf(action);
+                //CHANGE MIDDLE IP
+
+                var offSet = data.hasOwnProperty("urlOffset")
+                  ? data[i.toString()]["urlOffset"]
+                  : ":1880";
+
+                //TODO change this
+
+                if (sendHackFlag) {
+                  currentURL =
+                    "post://" +
+                    this.getHostIp() +
+                    offSet +
+                    "/dingzInput?mac=" +
+                    mac.toUpperCase() +
+                    "&action=" +
+                    buttonInteractions.indexOf(action) +
+                    "&button=" +
+                    i.toString();
+                } else {
+                  currentURL =
+                    "post://" +
+                    this.getHostIp() +
+                    offSet +
+                    "/dingzInput?mac%3D" +
+                    mac.toUpperCase() +
+                    "%26action%3D" +
+                    buttonInteractions.indexOf(action) +
+                    "%26button%3D" +
+                    i.toString();
+                }
               }
+              var url = action + "=" + currentURL;
+              settingButton.push(url);
             }
-            var url = action + "=" + currentURL;
-            settingURLs.push(url);
           }
+
+          settingURLs.push(settingButton);
         }
         resolvedData = settingURLs;
 
         //TODO change to not only 1 button
-        resolvedPath += "/api/v1/action/btn1";
+        resolvedPath += "/api/v1/action/";
       }
     }
 

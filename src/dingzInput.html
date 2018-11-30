@@ -91,11 +91,35 @@
       longDataForth: {
         value: ""
       },
+      showFirst: {
+        value: ""
+      },
+      showSecond: {
+        value: ""
+      },
+      showThird: {
+        value: ""
+      },
+      showForth: {
+        value: ""
+      }
 
     },
-    outputLabels: ["Report asdf", "Long click output"],
+    outputLabels: function(index) {
+      if (index == 0) {
+        return "Report"
+      }
+      index--;
+
+      var buttons = ["First", "Second", "Third", "Forth"]
+      var interactions = ["single", "double", "long"]
+
+      return (buttons[Math.floor(index / 3)] + " Button: " + interactions[index % 3] + " click")
+
+
+    },
     inputs: 0,
-    outputs: 4,
+    outputs: 13,
     icon: "myStrom-Button.png",
     label: function() {
       return this.name || "dingz Input";
@@ -113,47 +137,47 @@
       });
 
       //First
-      $('#node-input-show-first').change(function() {
+      $('#node-input-showFirst').change(function() {
         if (this.checked) {
           $('#node-input-advanced-config-first').show()
         } else {
           $('#node-input-advanced-config-first').hide()
         }
 
-        $('#node-input-show-first').val(this.checked);
+        $('#node-input-showFirst').val(this.checked);
       });
 
       //second
-      $('#node-input-show-second').change(function() {
+      $('#node-input-showSecond').change(function() {
         if (this.checked) {
           $('#node-input-advanced-config-second').show()
         } else {
           $('#node-input-advanced-config-second').hide()
         }
 
-        $('#node-input-show-second').val(this.checked);
+        $('#node-input-showSecond').val(this.checked);
       });
 
       //third
-      $('#node-input-show-third').change(function() {
+      $('#node-input-showThird').change(function() {
         if (this.checked) {
           $('#node-input-advanced-config-third').show()
         } else {
           $('#node-input-advanced-config-third').hide()
         }
 
-        $('#node-input-show-third').val(this.checked);
+        $('#node-input-showThird').val(this.checked);
       });
 
       //forth
-      $('#node-input-show-forth').change(function() {
+      $('#node-input-showForth').change(function() {
         if (this.checked) {
           $('#node-input-advanced-config-forth').show()
         } else {
           $('#node-input-advanced-config-forth').hide()
         }
 
-        $('#node-input-show-forth').val(this.checked);
+        $('#node-input-showForth').val(this.checked);
       });
 
 
@@ -182,15 +206,15 @@
           },
           error: function(jqXHR, textStatus, errorThrown) {
             if (jqXHR.status == 404) {
-              RED.notify(node._("common.notification.error", {
+              RED.notify(node._("common.notification.error.not-deployed", {
                 message: node._("common.notification.errors.not-deployed")
               }), "error");
             } else if (jqXHR.status == 500) {
-              RED.notify(node._("common.notification.error", {
+              RED.notify(node._("common.notification.error.failed", {
                 message: node._("inject.errors.failed")
               }), "error");
             } else if (jqXHR.status == 0) {
-              RED.notify(node._("common.notification.error", {
+              RED.notify(node._("common.notification.error.no-response", {
                 message: node._("common.notification.errors.no-response")
               }), "error");
             } else {
@@ -234,18 +258,15 @@
       </label>
   </div>
 
-
-  //TODO BUGGY
-
   <div id="node-input-advanced-config">
 
     <div class="form-row">
-      <label for="node-input-advanced"><i class="fa fa-square"></i> <span>Buttons</span></label>
-      <label for="node-input-advanced" style="width:70%">
-            <input type="checkbox" id="node-input-show-first" style="display:inline-block; width:22px; vertical-align:baseline;"><span>First</span>
-            <input type="checkbox" id="node-input-show-second" style="display:inline-block; width:22px; vertical-align:baseline;"><span>Second</span>
-            <input type="checkbox" id="node-input-show-third" style="display:inline-block; width:22px; vertical-align:baseline;"><span>Third</span>
-            <input type="checkbox" id="node-input-show-forth" style="display:inline-block; width:22px; vertical-align:baseline;"><span>Forth</span>
+      <label for="node-input-show"><i class="fa fa-square"></i> <span>Advanced config buttons</span></label>
+      <label for="node-input-show" style="width:70%">
+            <input type="checkbox" id="node-input-showFirst" style="display:inline-block; width:22px; vertical-align:baseline;"><span>First</span>
+            <input type="checkbox" id="node-input-showSecond" style="display:inline-block; width:22px; vertical-align:baseline;"><span>Second</span>
+            <input type="checkbox" id="node-input-showThird" style="display:inline-block; width:22px; vertical-align:baseline;"><span>Third</span>
+            <input type="checkbox" id="node-input-showForth" style="display:inline-block; width:22px; vertical-align:baseline;"><span>Forth</span>
         </label>
     </div>
 

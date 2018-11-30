@@ -12,143 +12,83 @@ module.exports = {
     pathResolved = resolvedArray[0];
     dataResolved = resolvedArray[1];
 
-    // console.log(dataResolved);
     //TODO remove this
     var sendHackFlag = true;
 
     if (sendHackFlag) {
-      var interactionTypes = ["single", "double", "long"];
+      var interactions = helpers.getButtonInteractions();
 
       for (var i = 0; i < dataResolved.length; i++) {
         var data = "";
         var pathSuffix = "";
-        for (var j = 0; j < interactionTypes.length; j++) {
-          var beginString = interactionTypes[i] + "=";
-          var index = dataResolved[i].indexOf(beginString);
-          if (index > -1) {
-            pathSuffix = "/" + interactionTypes[i];
 
-            data = dataResolved[i].substring(
+        for (var j = 0; j < dataResolved[0].length; j++) {
+          var beginString = interactions[j] + "=";
+          var index = dataResolved[i][j].indexOf(beginString);
+          if (index > -1) {
+            pathSuffix = "/btn" + i.toString() + "/" + interactions[j];
+
+            data = dataResolved[i][j].substring(
               index + beginString.length,
-              dataResolved[i].length
+              dataResolved[i][j].length
             );
           }
-        }
 
-        var http = require("http");
-        var body = "";
-        var options = {
-          host: ip,
-          path: pathResolved + pathSuffix,
-          port: emulateDevcies ? "8080" : "80"
-        };
+          var http = require("http");
+          var body = "";
+          var options = {
+            host: ip,
+            path: pathResolved + pathSuffix,
+            port: emulateDevcies ? "8080" : "80"
+          };
 
-        options.method = "POST";
-        options.headers = {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Content-Length": data.length
-        };
+          options.method = "POST";
+          options.headers = {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Length": data.length
+          };
 
-        var req = http.request(options, response => {
-          // Continuously update stream with data
-          response.on("data", function(d) {
-            body += d;
+          var req = http.request(options, response => {
+            // Continuously update stream with data
+            response.on("data", function(d) {
+              body += d;
+            });
+            response.on("end", function() {
+              var json = helpers.messageToJson(body);
+              callback(json);
+            });
           });
-          response.on("end", function() {
+
+          if (data.length > 0) {
+            req.write(data);
+          }
+
+          req.on("error", function(err) {
             var json = helpers.messageToJson(body);
             callback(json);
           });
-        });
 
-        if (data.length > 0) {
-          req.write(data);
+          req.end();
+
+          if (debug) {
+            node.log(
+              "\nDEVICE TYPE: " +
+                type +
+                "\nREQUEST TYPE: " +
+                options.method +
+                "\nDATA SENT: " +
+                data +
+                "\nADDRESS: " +
+                ip +
+                pathResolved +
+                "/" +
+                interactionTypes[i] +
+                "\n"
+            );
+          }
         }
-
-        req.on("error", function(err) {
-          var json = helpers.messageToJson(body);
-          callback(json);
-        });
-
-        req.end();
-
-        if (debug) {
-          node.log(
-            "\nDEVICE TYPE: " +
-              type +
-              "\nREQUEST TYPE: " +
-              options.method +
-              "\nDATA SENT: " +
-              data +
-              "\nADDRESS: " +
-              ip +
-              pathResolved +
-              "/" +
-              interactionTypes[i] +
-              "\n"
-          );
-        }
-
-        // return req;
       }
     }
-
-    // var http = require("http");
-    // var body = "";
-    // var options = {
-    //   host: ip,
-    //   path: pathResolved,
-    //   port: emulateDevcies ? "8080" : "80"
-    // };
-    //
-    // //Set options depending on type of request
-    // if (dataResolved.length <= 0) {
-    //   options.method = "GET";
-    // } else {
-    //   options.method = "POST";
-    //   options.headers = {
-    //     "Content-Type": "application/x-www-form-urlencoded",
-    //     "Content-Length": dataResolved.length
-    //   };
-    // }
-    //
-    // var req = http.request(options, response => {
-    //   // Continuously update stream with data
-    //   response.on("data", function(d) {
-    //     body += d;
-    //   });
-    //   response.on("end", function() {
-    //     var json = helpers.messageToJson(body);
-    //     callback(json);
-    //   });
-    // });
-
-    // req.on("error", function(err) {
-    //   var json = helpers.messageToJson(body);
-    //   callback(json);
-    // });
-    //
-    // if (dataResolved.length > 0) {
-    //   req.write(dataResolved);
-    // }
-    //
-    // req.end();
-    //
-    // if (debug) {
-    //   node.log(
-    //     "\nDEVICE TYPE: " +
-    //       type +
-    //       "\nREQUEST TYPE: " +
-    //       options.method +
-    //       "\nDATA SENT: " +
-    //       dataResolved +
-    //       "\nADDRESS: " +
-    //       ip +
-    //       pathResolved +
-    //       "\n"
-    //   );
-    // }
-    //
-    // return req;
   },
 
   isValid: function(json, type) {
@@ -160,55 +100,37 @@ module.exports = {
 
     if (type == "dingz") {
       if (json["request"] == "set") {
-        var hasSingle = false;
-        var hasDouble = false;
-        var hasLong = false;
+        var isValid = true;
+        for (var i = 0; i < helpers.getNumberOfInputs(); i++) {
+          var hasSingle = false;
+          var hasDouble = false;
+          var hasLong = false;
 
-        var data = json.hasOwnProperty("data");
+          var data = json.hasOwnProperty("data");
+          var current = data.hasOwnProperty(i.toString());
 
-        if (data) {
-          hasSingle = json.data.hasOwnProperty("single");
-          hasSingle &= json.data["single"].hasOwnProperty("url");
+          if (
+            json.hasOwnProperty("data") &&
+            json.data.hasOwnProperty(i.toString())
+          ) {
+            hasSingle = json.data[i.toString()].hasOwnProperty("single");
+            hasSingle &= json.data[i.toString()]["single"].hasOwnProperty(
+              "url"
+            );
 
-          hasDouble = json.data.hasOwnProperty("double");
-          hasDouble &= json.data["double"].hasOwnProperty("url");
+            hasDouble = json.data[i.toString()].hasOwnProperty("double");
+            hasDouble &= json.data[i.toString()]["double"].hasOwnProperty(
+              "url"
+            );
 
-          hasLong = json.data.hasOwnProperty("long");
-          hasLong &= json.data["long"].hasOwnProperty("url");
+            hasLong = json.data[i.toString()].hasOwnProperty("long");
+            hasLong &= json.data[i.toString()]["long"].hasOwnProperty("url");
+          }
+
+          isValid &= basics && (hasSingle || hasDouble || hasLong);
         }
 
-        return basics && (hasSingle || hasDouble || hasLong);
-
-        // var isValid= true
-        // for (var i = 0; i < helpers.getNumberOfButtons(); i++) {
-        //   var hasSingle = false;
-        //   var hasDouble = false;
-        //   var hasLong = false;
-        //
-        //   var data = json.hasOwnProperty("data");
-        //   var current = data.hasOwnProperty(i.toString());
-        //
-        //   if (
-        //     json.hasOwnProperty("data") &&
-        //     json.data.hasOwnProperty(i.toString())
-        //   ) {
-        //     hasSingle = json.data[i.toString()].hasOwnProperty("single");
-        //     hasSingle &= json.data[i.toString()]["single"].hasOwnProperty(
-        //       "url"
-        //     );
-        //
-        //     hasDouble = json.data[i.toString()].hasOwnProperty("double");
-        //     hasDouble &= json.data[i.toString()]["double"].hasOwnProperty(
-        //       "url"
-        //     );
-        //
-        //     hasLong = json.data[i.toString()].hasOwnProperty("long");
-        //     hasLong &= json.data[i.toString()]["long"].hasOwnProperty("url");
-        //   }
-        //
-        //   isValid &= basics && (hasSingle || hasDouble || hasLong);
-        // }
-        // return isValid;
+        return isValid;
       } else {
         return basics;
       }
@@ -216,27 +138,41 @@ module.exports = {
   },
 
   handleRequest: function(req, DEVICE_TYPE) {
-    var buttonActions =
-      DEVICE_TYPE != "buttonplus"
-        ? ["single", "double", "long"]
-        : ["single", "double", "long", "touch"];
+    var buttonActions = helpers.getButtonInteractions();
+    var buttonText = helpers.getButtonTexts();
 
     //check if wire
     if (req.hasOwnProperty("mac") && req.hasOwnProperty("action")) {
       var buttonList = helpers.getWiredList();
 
+      //TODO
+      console.log(buttonList);
+      console.log(req);
+
       for (var button of buttonList) {
+        console.log(button.actions[0][2]);
+        console.log(req.action);
         if (
           !isNaN(req.action) &&
+          !isNaN(req.button) &&
           parseInt(req.action) < buttonActions.length &&
-          button.actions[req.action] &&
+          parseInt(req.button) < buttonText.length &&
+          button.actions[req.button][req.action] &&
           button.mac == req.mac
         ) {
-          var messages = new Array(buttonActions.length + 1).fill(null);
-          var index = parseInt(req.action) + 1;
+          var messages = new Array(
+            buttonActions.length * buttonText.length + 1
+          ).fill(null);
 
-          messages[index] = {
-            payload: true
+          var actionReportOffset = parseInt(req.action) + 1;
+          var buttonIndex = parseInt(req.button);
+
+          messages[buttonIndex * 3 + actionReportOffset] = {
+            payload:
+              helpers.getButtonTexts()[buttonIndex] +
+              " Button: " +
+              helpers.getButtonInteractions()[req.action] +
+              " click"
           };
 
           var node = helpers.getNodeForMac()[req.mac];

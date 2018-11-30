@@ -18,6 +18,7 @@ module.exports = function(RED) {
       node,
       this.DEVICE_TYPE
     );
+
     helpers.setupWiredListFromJSON(taskJSON, node);
     helpers.setupNodeMacPairs(node);
     requests.doAsync(back, this.DEVICE_TYPE, taskJSON, node);
@@ -52,32 +53,34 @@ module.exports = function(RED) {
       });
     }
 
-    // function getData(){
-    //   var object = {}
-    //   for(var i = 0; i < helpers.getButtonTypes();i++){
-    //
-    //   }
-    // }
-
     function getJsonFromProperty(device, config, node, type) {
+      data = {};
+
+      var textArray = helpers.getButtonTexts();
+
+      for (var i = 0; i < helpers.getNumberOfInputs(); i++) {
+        var currentButton = textArray[i];
+        var entireButton = {};
+        for (var j = 0; j < helpers.getButtonInteractions().length; j++) {
+          var interaction = helpers.getButtonInteractions()[j];
+
+          var temp = {
+            url:
+              config.advanced && config["show" + currentButton]
+                ? config[interaction + "URL" + currentButton]
+                : "wire",
+            "url-data": config[interaction + "Data" + currentButton]
+          };
+          entireButton[interaction] = temp;
+        }
+        data[i.toString()] = entireButton;
+      }
+
       taskJSON = {
         ip: device.host,
         mac: device.mac,
         request: config.request,
-        data: {
-          single: {
-            url: config.advanced ? config.singleURL : "wire",
-            "url-data": config.singleData
-          },
-          double: {
-            url: config.advanced ? config.doubleURL : "wire",
-            "url-data": config.doubleData
-          },
-          long: {
-            url: config.advanced ? config.longURL : "wire",
-            "url-data": config.longData
-          }
-        }
+        data: data
       };
 
       node.status({
@@ -97,6 +100,25 @@ module.exports = function(RED) {
     this.on("close", function() {});
   }
   RED.nodes.registerType("dingz Input", dingzInput);
+
+  RED.httpAdmin.post(
+    "/inject/:id",
+    RED.auth.needsPermission("inject.write"),
+    function(req, res) {
+      var node = RED.nodes.getNode(req.params.id);
+      if (node != null) {
+        try {
+          node.receive();
+          res.sendStatus(200);
+        } catch (err) {
+          res.sendStatus(500);
+          node.error(RED._("inject.failed", { error: err.toString() }));
+        }
+      } else {
+        res.sendStatus(404);
+      }
+    }
+  );
 
   RED.httpAdmin.post("/dingzInput", function(req, res) {
     var request = require("../utils/requests");
