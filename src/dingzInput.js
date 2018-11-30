@@ -1,16 +1,18 @@
+var http = require("http");
 module.exports = function(RED) {
   function dingzInput(config) {
     RED.nodes.createNode(this, config);
     var context = this.context();
     var node = this;
     this.device = RED.nodes.getNode(config.device);
-
     var helpers = require("../utils/helpers");
     var requests = require("../utils/requests");
     var deviceHelper = require("../utils/deviceListHelper");
     deviceHelper.startDeviceListener(node);
     this.DEVICE_TYPE = "dingz";
     helpers.setupNodeMacPairs(node);
+    this.connected = false;
+    this.prevStateConnected = false;
 
     var taskJSON = getJsonFromProperty(
       this.device,
@@ -23,12 +25,27 @@ module.exports = function(RED) {
     helpers.setupNodeMacPairs(node);
     requests.doAsync(back, this.DEVICE_TYPE, taskJSON, node);
 
+    //Get state of dingz
+    updateDingzState(this.device.host);
+    setInterval(updateDingzState.bind(this), 5000, this.device.host);
+
     //EXECUTE REQUEST
-    this.on("input", function(msg) {
+    this.on("input", msg => {
       require("../utils/helpers").setupNodeMacPairs(node);
       var taskJSON;
       //BUTTON CLICK
       if (!msg.hasOwnProperty("payload")) {
+        if (!this.connected) {
+          node.error(
+            "UNREACHABLE: dingz " +
+              config.name +
+              " with " +
+              this.device.host +
+              "@" +
+              this.device.mac
+          );
+        }
+
         taskJSON = getJsonFromProperty(
           this.device,
           config,
@@ -51,6 +68,48 @@ module.exports = function(RED) {
       node.send({
         payload: str
       });
+    }
+
+    function updateDingzState(ip) {
+      http
+        .get("http://" + ip + "/info", res => {
+          this.prevStateConnected = true;
+          node.status({
+            fill: "green",
+            shape: "dot",
+            text: "dingz reachable"
+          });
+          if (this.connected != undefined) {
+            this.connected = true;
+          }
+        })
+        .on("error", e => {
+          this.prevStateConnected = false;
+
+          node.status({
+            fill: "red",
+            shape: "ring",
+            text: "dingz unreachable"
+          });
+          if (this.connected != undefined) {
+            this.connected = false;
+          }
+        })
+        .on("timeout", () => {
+          if (!this.prevStateConnected) {
+            node.status({
+              fill: "red",
+              shape: "ring",
+              text: "dingz unreachable"
+            });
+            if (this.connected != undefined) {
+              this.connected = false;
+            }
+          }
+
+          this.prevStateConnected = false;
+        })
+        .setTimeout(1000);
     }
 
     function getJsonFromProperty(device, config, node, type) {
@@ -82,12 +141,6 @@ module.exports = function(RED) {
         request: config.request,
         data: data
       };
-
-      node.status({
-        fill: "yellow",
-        shape: "ring",
-        text: "Using property"
-      });
 
       if (!requests.isValid(taskJSON, type)) {
         node.error("Conversion from property to json failed");

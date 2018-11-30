@@ -7,7 +7,7 @@
         value: ""
       },
       request: {
-        value: "",
+        value: "set",
         required: true
       },
       device: {
@@ -106,10 +106,10 @@
 
     },
     outputLabels: function(index) {
-      if (index == 0) {
-        return "Report"
-      }
-      index--;
+      // if (index == 0) {
+      //   return "Report"
+      // }
+      // index--;
 
       var buttons = ["First", "Second", "Third", "Forth"]
       var interactions = ["single", "double", "long"]
@@ -119,7 +119,7 @@
 
     },
     inputs: 0,
-    outputs: 13,
+    outputs: 12,
     icon: "myStrom-Button.png",
     label: function() {
       return this.name || "dingz Input";
@@ -199,9 +199,8 @@
           url: "inject/" + this.id,
           type: "POST",
           success: function(resp) {
-
-            RED.notify(node._("dingz configuration uploaded", {
-              label: label
+            RED.notify(node._("dingz configuration updated", {
+              message: node._("dingz configuration updated")
             }), "success");
           },
           error: function(jqXHR, textStatus, errorThrown) {
@@ -243,13 +242,13 @@
     <input id="node-input-device">
   </div>
 
-  <div class="form-row">
+  <!--<div class="form-row">
     <label for="node-input-request"><i class="fa fa-paper-plane"></i> Request</label>
     <select type="text" id="node-input-request" onchange="requestChange(value)">
       <option value="set" selected>Set dingz action</option>
       <option value="report">Report</option>
     </select>
-  </div>
+  </div>-->
 
   <div class="form-row">
     <label for="node-input-advanced"><i class="fa fa-cog"></i> <span>Config</span></label>

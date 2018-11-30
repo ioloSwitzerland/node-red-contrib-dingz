@@ -164,7 +164,7 @@ module.exports = {
             buttonActions.length * buttonText.length + 1
           ).fill(null);
 
-          var actionReportOffset = parseInt(req.action) + 1;
+          var actionReportOffset = parseInt(req.action) /*+ 1*/;
           var buttonIndex = parseInt(req.button);
 
           messages[buttonIndex * 3 + actionReportOffset] = {
