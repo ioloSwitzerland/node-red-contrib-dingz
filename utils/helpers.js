@@ -135,24 +135,24 @@ module.exports = {
     listenerState = state;
   },
   getDeviceList: function() {
-    if (deviceList == null) {
+    if (deviceList == null || deviceList == []) {
       fs = require("fs");
-      var data;
+      var deviceListNew;
       var path = __dirname + "/deviceList.json";
       if (fs.existsSync(path)) {
-        data = JSON.parse(fs.readFileSync(path, "utf8"));
+        deviceListNew = JSON.parse(fs.readFileSync(path, "utf8"));
       } else {
-        data = [];
+        deviceListNew = [];
       }
-      macNameList = data;
     }
-    return deviceList;
+
+    return deviceListNew;
   },
 
   setDeviceList: function(list) {
     deviceList = list;
     fs = require("fs");
-    var path = __dirname + "/deviceList.json";
+    var path = __dirname + "/.json";
 
     try {
       fs.writeFileSync(path, JSON.stringify(list));

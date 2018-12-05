@@ -68,13 +68,16 @@ module.exports = {
         deviceList.push(device);
         helpers.setDeviceList(deviceList);
         if (typeof node != undefined) {
-          // node.warn(`Discovered: ${name}@${ip} with ${mac}`);
+          node.warn(`Discovered: ${name}@${ip} with ${mac}`);
         }
       }
     });
 
     server.on("error", err => {
       console.log(`server error:\n${err.stack}`);
+      console.log(
+        "If you get the EADDRINUSE error and are using dingz and mystrom nodes togeth you can disregard this"
+      );
       server.close();
     });
 

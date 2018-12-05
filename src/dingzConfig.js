@@ -8,7 +8,7 @@ module.exports = function(RED) {
 
   RED.nodes.registerType("dingz Config", dingzConfig);
 
-  RED.httpAdmin.get("/devices/list", function(req, res) {
+  RED.httpAdmin.get("/devices/list/dingz", function(req, res) {
     var deviceHelper = require("../utils/deviceListHelper");
     var helpers = require("../utils/helpers");
 
