@@ -137,7 +137,7 @@ module.exports = {
   },
   getDeviceList: function() {
     var deviceListNew = deviceList;
-    if (deviceListNew == null || deviceListNew == []) {
+    /*if (deviceListNew == null || deviceListNew == []) {
       fs = require("fs");
 
       var path = __dirname + "/deviceList.json";
@@ -146,21 +146,21 @@ module.exports = {
       } else {
         deviceListNew = [];
       }
-    }
+    }*/
 
     return deviceListNew;
   },
 
   setDeviceList: function(list) {
     deviceList = list;
-    fs = require("fs");
+    /*  fs = require("fs");
     var path = __dirname + "/.json";
 
     try {
       fs.writeFileSync(path, JSON.stringify(list));
     } catch (err) {
       console.log("Error writing Metadata.json:" + err.message);
-    }
+    }*/
   },
 
   //validity has to be checked beforehand
@@ -298,6 +298,7 @@ module.exports = {
           })
           .on("error", e => {
             console.error(`Got error: ${e.message}`);
+            callback("error", taskJSON, finallyCallback);
           });
       } else if (request == "output") {
         console.log("OUTPut");
@@ -378,6 +379,32 @@ module.exports = {
       }
     }
     return null;
+  },
+
+  getDateString: function() {
+    var date = new Date();
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ];
+
+    var month = monthNames[date.getMonth()];
+    var day = date.getDate();
+    var h = date.getHours();
+    var min = date.getMinutes();
+    var s = date.getSeconds();
+
+    return " at " + h + ":" + min + ":" + s + " " + day + "th of " + month;
   }
 };
 

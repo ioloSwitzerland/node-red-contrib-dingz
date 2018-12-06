@@ -11,12 +11,6 @@ module.exports = function(RED) {
     deviceHelper.startDeviceListener(node);
     this.DEVICE_TYPE = "dingz";
     helpers.setupNodeMacPairs(node);
-    this.connected = false;
-    this.prevStateConnected = false;
-
-    //Get state of dingz
-    updateDingzState(this.device.host);
-    setInterval(updateDingzState.bind(this), 5000, this.device.host);
 
     //EXECUTE REQUEST
     this.on("input", msg => {
@@ -24,7 +18,13 @@ module.exports = function(RED) {
       var taskJSON;
       //BUTTON CLICK
       if (!msg.hasOwnProperty("payload")) {
-        if (!this.connected) {
+        if (helpers.getDevice(this.device.mac) == null) {
+          node.status({
+            fill: "red",
+            shape: "ring",
+            text: "dingz unreachable" + helpers.getDateString()
+          });
+
           node.error(
             "UNREACHABLE: dingz " +
               config.name +
@@ -51,12 +51,24 @@ module.exports = function(RED) {
 
     //CALLBACK
     function back(str) {
-      if (str["success"] == "false") {
+      if (str["success"] == false) {
         node.error("An error occured while sending");
+        node.status({
+          fill: "red",
+          shape: "ring",
+          text: "dingz unreachable"
+        });
+      } else if (str["success"] == true) {
+        node.status({
+          fill: "green",
+          shape: "dot",
+          text: "Updated" + helpers.getDateString()
+        });
       }
-      node.send({
-        payload: str
-      });
+
+      // node.send({
+      //   payload: str
+      // });
     }
 
     function updateDingzState(ip) {

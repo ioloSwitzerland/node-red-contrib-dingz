@@ -11,17 +11,21 @@ module.exports = {
       callback
     );
   },
+
   doAsyncCallback: function(resolvedArray, taskJSON, finallyCallback) {
-    if (
+    if (resolvedArray == "error") {
+      finallyCallback({ success: false });
+    } else if (
       resolvedArray == null ||
       resolvedArray[0] == null ||
       resolvedArray[0].length == 0
     ) {
       //NOTHING HAS CHANGED
+      finallyCallback({ success: true, changed: false });
       return;
     }
 
-    var debug = true;
+    var debug = false;
     ip = taskJSON["ip"];
 
     var pathResolved = resolvedArray[0];

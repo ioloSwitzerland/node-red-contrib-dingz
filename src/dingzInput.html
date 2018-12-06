@@ -199,9 +199,9 @@
           url: "inject/" + this.id,
           type: "POST",
           success: function(resp) {
-            RED.notify(node._("dingz configuration updated", {
-              message: node._("dingz configuration updated")
-            }), "success");
+            // RED.notify(node._("dingz configuration updated", {
+            //   message: node._("dingz configuration updated")
+            // }), "success");
           },
           error: function(jqXHR, textStatus, errorThrown) {
             if (jqXHR.status == 404) {
