@@ -175,7 +175,6 @@ module.exports = function(RED) {
   );
 
   RED.httpAdmin.post("/dingzInput", function(req, res) {
-    console.log("GOT REQUEST");
     var request = require("../utils/requests");
     req = req.body;
 

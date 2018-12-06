@@ -157,12 +157,12 @@ module.exports = {
       var buttonList = helpers.getWiredList();
 
       //TODO
-      console.log(buttonList);
-      console.log(req);
+      // console.log(buttonList);
+      // console.log(req);
 
       for (var button of buttonList) {
-        console.log(button.actions[0][2]);
-        console.log(req.action);
+        // console.log(button.actions[0][2]);
+        // console.log(req.action);
         if (
           !isNaN(req.action) &&
           !isNaN(req.button) &&

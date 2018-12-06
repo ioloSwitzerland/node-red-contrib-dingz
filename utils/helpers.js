@@ -1,5 +1,6 @@
 var typeList = ["switch", "bulb", "buttonplus", "button", "strip", "dingz"];
 var buttonTypes = 4;
+var dimmerText = ["Zero", "One", "Two", "Three"];
 var buttonText = ["First", "Second", "Third", "Forth"];
 var buttonInteractions = ["single", "double", "long"];
 var deviceList = []; //array of mac addresses which are already registerType
@@ -301,7 +302,18 @@ module.exports = {
             callback("error", taskJSON, finallyCallback);
           });
       } else if (request == "output") {
-        console.log("OUTPut");
+        //4 = amount of dimmer inputs
+        var settingData = [];
+        var settingPath = [];
+        for (var i = 0; i < dimmerText.length; i++) {
+          var dummyData = "dummy";
+          var outValue = data["output" + dimmerText[i]];
+          var path = "/api/v1/dimmer/" + i.toString() + "/on?value=" + outValue;
+          settingData.push(dummyData);
+          settingPath.push(path);
+        }
+        resolvedData = [settingData];
+        resolvedPath = [settingPath];
       }
 
       callback([resolvedPath, resolvedData], taskJSON, finallyCallback);

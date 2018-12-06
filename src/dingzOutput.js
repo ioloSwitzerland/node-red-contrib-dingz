@@ -1,7 +1,7 @@
 module.exports = function(RED) {
   function dingzOutput(config) {
     RED.nodes.createNode(this, config);
-    var context = this.context();
+
     var node = this;
     this.device = RED.nodes.getNode(config.device);
     var helpers = require("../utils/helpers");
@@ -25,7 +25,7 @@ module.exports = function(RED) {
         taskJSON = {
           ip: this.device.host,
           mac: this.device.mac,
-          request: config.request,
+          request: config.request != "output" ? "output" : config.request,
           data: {
             outputZero: config.outputZero,
             outputOne: config.outputOne,
