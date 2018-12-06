@@ -65,6 +65,8 @@ module.exports = {
       };
 
       if (helpers.getDevice(mac) == null) {
+        var deviceList = helpers.getDeviceList();
+
         deviceList.push(device);
         helpers.setDeviceList(deviceList);
         if (typeof node != undefined) {

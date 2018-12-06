@@ -479,25 +479,8 @@
 </style>
 
 
-<script>
-  function requestChange(value) {
-    var actions = ["single", "double", "long", "touch"]
-    var actionsData = ["URL ", "Data "]
-
-    var elements = document.getElementsByClassName("inline");
-
-    for (var i = 0; i < elements.length; i++) {
-      for (var input of elements[i].getElementsByTagName('input')) {
-        //Disable if equal to report
-        var disable = value != "set"
-        input.disabled = disable
-      }
-
-    }
-  }
-</script>
 
 
-<script type="text/x-red " data-help-name="myStrom Button">
+<script type="text/x-red " data-help-name="dingz Input">
   NONE
 </script>

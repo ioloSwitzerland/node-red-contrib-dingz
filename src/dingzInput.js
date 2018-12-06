@@ -14,17 +14,6 @@ module.exports = function(RED) {
     this.connected = false;
     this.prevStateConnected = false;
 
-    var taskJSON = getJsonFromProperty(
-      this.device,
-      config,
-      node,
-      this.DEVICE_TYPE
-    );
-
-    helpers.setupWiredListFromJSON(taskJSON, node);
-    helpers.setupNodeMacPairs(node);
-    requests.doAsync(back, this.DEVICE_TYPE, taskJSON, node);
-
     //Get state of dingz
     updateDingzState(this.device.host);
     setInterval(updateDingzState.bind(this), 5000, this.device.host);
@@ -174,6 +163,7 @@ module.exports = function(RED) {
   );
 
   RED.httpAdmin.post("/dingzInput", function(req, res) {
+    console.log("GOT REQUEST");
     var request = require("../utils/requests");
     req = req.body;
 

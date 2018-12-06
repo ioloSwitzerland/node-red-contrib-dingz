@@ -3,49 +3,47 @@ var http = require("http");
 
 module.exports = {
   doAsync: function(callback, type, taskJSON, node) {
-    var debug = false;
-    var emulateDevcies = false;
+    var resolvedArray = helpers.getPathAndData(
+      type,
+      taskJSON,
+      node,
+      module.exports.doAsyncCallback,
+      callback
+    );
+  },
+  doAsyncCallback: function(resolvedArray, taskJSON, finallyCallback) {
+    if (
+      resolvedArray == null ||
+      resolvedArray[0] == null ||
+      resolvedArray[0].length == 0
+    ) {
+      //NOTHING HAS CHANGED
+      return;
+    }
 
+    var debug = true;
     ip = taskJSON["ip"];
 
-    var resolvedArray = helpers.getPathAndData(type, taskJSON, node);
-    pathResolved = resolvedArray[0];
-    dataResolved = resolvedArray[1];
+    var pathResolved = resolvedArray[0];
+    var dataResolved = resolvedArray[1];
 
     //TODO remove this
     var sendHackFlag = true;
 
     if (sendHackFlag) {
-      var interactions = helpers.getButtonInteractions();
-
       for (var i = 0; i < dataResolved.length; i++) {
-        var data = "";
-        var pathSuffix = "";
-
-        for (var j = 0; j < dataResolved[0].length; j++) {
-          var beginString = interactions[j] + "=";
-          var index = dataResolved[i][j].indexOf(beginString);
-          if (index > -1) {
-            pathSuffix = "/btn" + i.toString() + "/" + interactions[j];
-
-            data = dataResolved[i][j].substring(
-              index + beginString.length,
-              dataResolved[i][j].length
-            );
-          }
-
-          var http = require("http");
+        for (var j = 0; j < dataResolved[i].length; j++) {
           var body = "";
           var options = {
             host: ip,
-            path: pathResolved + pathSuffix,
-            port: emulateDevcies ? "8080" : "80"
+            path: pathResolved[i][j],
+            port: "80"
           };
 
           options.method = "POST";
           options.headers = {
             "Content-Type": "application/x-www-form-urlencoded",
-            "Content-Length": data.length
+            "Content-Length": dataResolved[i][j].length
           };
 
           var req = http.request(options, response => {
@@ -55,34 +53,32 @@ module.exports = {
             });
             response.on("end", function() {
               var json = helpers.messageToJson(body);
-              callback(json);
+              finallyCallback(json);
             });
           });
 
-          if (data.length > 0) {
-            req.write(data);
+          if (dataResolved[i][j].length > 0) {
+            req.write(dataResolved[i][j]);
           }
 
           req.on("error", function(err) {
             var json = helpers.messageToJson(body);
-            callback(json);
+            finallyCallback(json);
           });
 
           req.end();
 
           if (debug) {
-            node.log(
+            console.log(
               "\nDEVICE TYPE: " +
-                type +
+                "dingz" +
                 "\nREQUEST TYPE: " +
                 options.method +
                 "\nDATA SENT: " +
-                data +
+                dataResolved[i][j] +
                 "\nADDRESS: " +
-                ip +
-                pathResolved +
-                "/" +
-                interactionTypes[i] +
+                options.host +
+                options.path +
                 "\n"
             );
           }
@@ -99,7 +95,18 @@ module.exports = {
     var basics = hasIP && hasMAC && hasRequest;
 
     if (type == "dingz") {
-      if (json["request"] == "set") {
+      if (json["request"] == "output") {
+        if (!json.hasOwnProperty("data")) {
+          return false;
+        } else {
+          var hasZero = json.data.hasOwnProperty("outputZero");
+          var hasOne = json.data.hasOwnProperty("outputOne");
+          var hasTwo = json.data.hasOwnProperty("outputTwo");
+          var hasThree = json.data.hasOwnProperty("outputThree");
+
+          return hasZero && hasOne && hasTwo && hasThree && basics;
+        }
+      } else if (json["request"] == "set") {
         var isValid = true;
         for (var i = 0; i < helpers.getNumberOfInputs(); i++) {
           var hasSingle = false;

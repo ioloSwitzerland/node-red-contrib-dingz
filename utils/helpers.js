@@ -1,4 +1,4 @@
-var typeList = ["dingz"];
+var typeList = ["switch", "bulb", "buttonplus", "button", "strip", "dingz"];
 var buttonTypes = 4;
 var buttonText = ["First", "Second", "Third", "Forth"];
 var buttonInteractions = ["single", "double", "long"];
@@ -6,6 +6,7 @@ var deviceList = []; //array of mac addresses which are already registerType
 var nodeForMac = [];
 var listenerState = false;
 var macNameList;
+var http = require("http");
 
 module.exports = {
   getButtonInteractions: function() {
@@ -135,9 +136,10 @@ module.exports = {
     listenerState = state;
   },
   getDeviceList: function() {
-    if (deviceList == null || deviceList == []) {
+    var deviceListNew = deviceList;
+    if (deviceListNew == null || deviceListNew == []) {
       fs = require("fs");
-      var deviceListNew;
+
       var path = __dirname + "/deviceList.json";
       if (fs.existsSync(path)) {
         deviceListNew = JSON.parse(fs.readFileSync(path, "utf8"));
@@ -162,7 +164,13 @@ module.exports = {
   },
 
   //validity has to be checked beforehand
-  getPathAndData: function(type, taskJSON, node) {
+  getPathAndData: async function(
+    type,
+    taskJSON,
+    node,
+    callback,
+    finallyCallback
+  ) {
     var sendHackFlag = true;
 
     ip = taskJSON["ip"];
@@ -170,95 +178,133 @@ module.exports = {
     request = taskJSON["request"];
     data = taskJSON["data"];
 
-    var resolvedPath = "";
-    var resolvedData = "";
+    var resolvedPath;
+    var resolvedData;
 
     if (type == "dingz") {
       if (request == "report") {
         //NO DATA SENT
+        resolvedData = "";
         //TODO CHANGE URL
-        resolvedPath += "/info";
+        resolvedPath = ["/info"];
       } else if (request == "set") {
-        var settingURLs = [];
+        http
+          .get("http://" + ip + "/api/v1/action", res => {
+            const contentType = res.headers["application/json"];
 
-        for (var i = 0; i < buttonText.length; i++) {
-          var settingButton = [];
-          for (var action of buttonInteractions) {
-            var currentURL = "";
-            var errorFlag = false;
+            res.setEncoding("utf8");
+            let rawData = "";
 
-            if (
-              data[i.toString()].hasOwnProperty(action) &&
-              data[i.toString()][action]["url"].length > 0
-            ) {
-              if (data[i.toString()][action]["url"] != "wire") {
-                var current = data[i.toString()][action];
-                var url = current["url"];
-                currentURL = "get://" + url;
+            res.on("data", chunk => {
+              rawData += chunk;
+            });
+            res.on("end", () => {
+              try {
+                const parsedData = JSON.parse(rawData);
+                //ISNERT HERE
+                var settingURLs = [];
+                var settingPaths = [];
 
-                if (
-                  current.hasOwnProperty("url-data") &&
-                  current["url-data"].length > 0
-                ) {
-                  var urlData = current["url-data"];
-                  //replace = with %3D
-                  if (!sendHackFlag) {
-                    urlData = urlData.replace(/=/g, "%3D");
-                    urlData = urlData.replace(/&/g, "%26");
+                for (var i = 0; i < buttonText.length; i++) {
+                  var settingButtonURL = [];
+                  var settingButtonPaths = [];
+
+                  for (var action of buttonInteractions) {
+                    var dingzActor = "btn" + i.toString();
+                    var resolvedPath = "/" + dingzActor + "/" + action;
+                    var currentURL = "";
+                    var errorFlag = false;
+
+                    if (
+                      data[i.toString()].hasOwnProperty(action) &&
+                      data[i.toString()][action]["url"].length > 0
+                    ) {
+                      if (data[i.toString()][action]["url"] != "wire") {
+                        var current = data[i.toString()][action];
+                        var url = current["url"];
+                        currentURL = "get://" + url;
+
+                        if (
+                          current.hasOwnProperty("url-data") &&
+                          current["url-data"].length > 0
+                        ) {
+                          var urlData = current["url-data"];
+                          //replace = with %3D
+                          if (!sendHackFlag) {
+                            urlData = urlData.replace(/=/g, "%3D");
+                            urlData = urlData.replace(/&/g, "%26");
+                          }
+                          currentURL = "post://" + url + "?" + urlData;
+                        }
+                      } else {
+                        //CHANGE MIDDLE IP
+
+                        var offSet = data.hasOwnProperty("urlOffset")
+                          ? data[i.toString()]["urlOffset"]
+                          : ":1880";
+
+                        //TODO change this
+
+                        if (sendHackFlag) {
+                          currentURL =
+                            "post://" +
+                            this.getHostIp() +
+                            offSet +
+                            "/dingzInput?mac=" +
+                            mac.toUpperCase() +
+                            "&action=" +
+                            buttonInteractions.indexOf(action) +
+                            "&button=" +
+                            i.toString();
+                        } else {
+                          currentURL =
+                            "post://" +
+                            this.getHostIp() +
+                            offSet +
+                            "/dingzInput?mac%3D" +
+                            mac.toUpperCase() +
+                            "%26action%3D" +
+                            buttonInteractions.indexOf(action) +
+                            "%26button%3D" +
+                            i.toString();
+                        }
+                      }
+
+                      if (parsedData[dingzActor][action] != currentURL) {
+                        var url = currentURL;
+                        var path = "/api/v1/action" + resolvedPath;
+
+                        settingButtonPaths.push(path);
+                        settingButtonURL.push(url);
+                      }
+                    }
                   }
 
-                  //replace & with %26
-
-                  currentURL = "post://" + url + "?" + urlData;
+                  settingURLs.push(settingButtonURL);
+                  settingPaths.push(settingButtonPaths);
                 }
-              } else {
-                //CHANGE MIDDLE IP
 
-                var offSet = data.hasOwnProperty("urlOffset")
-                  ? data[i.toString()]["urlOffset"]
-                  : ":1880";
-
-                //TODO change this
-
-                if (sendHackFlag) {
-                  currentURL =
-                    "post://" +
-                    this.getHostIp() +
-                    offSet +
-                    "/dingzInput?mac=" +
-                    mac.toUpperCase() +
-                    "&action=" +
-                    buttonInteractions.indexOf(action) +
-                    "&button=" +
-                    i.toString();
-                } else {
-                  currentURL =
-                    "post://" +
-                    this.getHostIp() +
-                    offSet +
-                    "/dingzInput?mac%3D" +
-                    mac.toUpperCase() +
-                    "%26action%3D" +
-                    buttonInteractions.indexOf(action) +
-                    "%26button%3D" +
-                    i.toString();
-                }
+                resolvedData = settingURLs;
+                resolvedPath = settingPaths;
+                callback(
+                  [resolvedPath, resolvedData],
+                  taskJSON,
+                  finallyCallback
+                );
+              } catch (e) {
+                console.error(e.message);
               }
-              var url = action + "=" + currentURL;
-              settingButton.push(url);
-            }
-          }
-
-          settingURLs.push(settingButton);
-        }
-        resolvedData = settingURLs;
-
-        //TODO change to not only 1 button
-        resolvedPath += "/api/v1/action/";
+            });
+          })
+          .on("error", e => {
+            console.error(`Got error: ${e.message}`);
+          });
+      } else if (request == "output") {
+        console.log("OUTPut");
       }
-    }
 
-    return [resolvedPath, resolvedData];
+      callback([resolvedPath, resolvedData], taskJSON, finallyCallback);
+    }
   },
 
   //TODO CORRECT ERROR HANDLING
@@ -280,11 +326,32 @@ module.exports = {
 
   numberToType: function(number) {
     switch (number) {
+      case 101:
+        return "switch"; //v1
+        break;
+      case 102:
+        return "bulb";
+        break;
+      case 103:
+        return "buttonplus";
+        break;
+      case 104:
+        return "button";
+        break;
+      case 105:
+        return "strip";
+        break;
+      case 106:
+        return "switch"; //v2
+        break;
+      case 107:
+        return "switch"; //EU
+        break;
       case 108:
         return "dingz"; //v1
         break;
       default:
-        return "unknown";
+        return "unkown";
     }
   },
 

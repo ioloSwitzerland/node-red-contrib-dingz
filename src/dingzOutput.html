@@ -1,0 +1,130 @@
+<script type="text/javascript">
+  RED.nodes.registerType('dingz Output', {
+    category: 'dingz ',
+    color: '#6eb9cc',
+    defaults: {
+      name: {
+        value: ""
+      },
+      request: {
+        value: "output",
+        required: true
+      },
+      device: {
+        value: "",
+        type: "dingz Config",
+        required: true
+      },
+      outputZero: {
+        value: ""
+      },
+      outputOne: {
+        value: ""
+      },
+      outputTwo: {
+        value: ""
+      },
+      outputThree: {
+        value: ""
+      }
+
+    },
+    outputLabels: "output",
+    inputs: 1,
+    outputs: 1,
+    icon: "myStrom-Button.png",
+    label: function() {
+      return this.name || "dingz Output";
+    },
+    oneditprepare: function() {
+      $('#node-input-outputZero').change(function() {
+        var newVal = $(this).val()
+        $('#node-input-outputZero-text').text(newVal + "%");
+      });
+
+      $('#node-input-outputOne').change(function() {
+        var newVal = $(this).val()
+        $('#node-input-outputOne-text').text(newVal + "%");
+      });
+
+      $('#node-input-outputTwo').change(function() {
+        var newVal = $(this).val()
+        $('#node-input-outputTwo-text').text(newVal + "%");
+      });
+
+      $('#node-input-outputThree').change(function() {
+        var newVal = $(this).val()
+        $('#node-input-outputThree-text').text(newVal + "%");
+      });
+    }
+
+
+  });
+</script>
+
+<script type="text/x-red" data-template-name="dingz Output">
+  <div class="form-row">
+    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name"></i>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-device"><i class="fa fa-toggle-on"></i> Device</label>
+    <input id="node-input-device">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-output0"><i class="fa  fa-arrow-right"></i> <span>Output 1</span></label>
+
+    <label for="node-input-output0" style="width:70%">
+          <input type="range" min="0" max="100" id="node-input-outputZero" style="display:inline-block; width:70%; vertical-align:baseline;"/>
+          <div id="node-input-outputZero-text" style="margin-left:22px;display:inline-block;vertical-align:baseline;">
+            100%
+            </div>
+
+      </label>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-output0"><i class="fa  fa-arrow-right"></i> <span>Output 2</span></label>
+
+    <label for="node-input-output0" style="width:70%">
+          <input type="range" min="0" max="100" id="node-input-outputOne" style="display:inline-block; width:70%; vertical-align:baseline;"/>
+          <div id="node-input-outputOne-text" style="margin-left:22px;display:inline-block;vertical-align:baseline;">
+            100%
+            </div>
+
+      </label>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-output0"><i class="fa  fa-arrow-right"></i> <span>Output 3</span></label>
+
+    <label for="node-input-output0" style="width:70%">
+          <input type="range" min="0" max="100" id="node-input-outputTwo" style="display:inline-block; width:70%; vertical-align:baseline;"/>
+          <div id="node-input-outputTwo-text" style="margin-left:22px;display:inline-block;vertical-align:baseline;">
+            100%
+            </div>
+
+      </label>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-output0"><i class="fa  fa-arrow-right"></i> <span>Output 4</span></label>
+
+    <label for="node-input-output0" style="width:70%">
+          <input type="range" min="0" max="100" id="node-input-outputThree" style="display:inline-block; width:70%; vertical-align:baseline;"/>
+          <div id="node-input-outputThree-text" style="margin-left:22px;display:inline-block;vertical-align:baseline;">
+            100%
+            </div>
+
+      </label>
+  </div>
+
+
+</script>
+
+
+<script type="text/x-red " data-help-name="dingz Output">
+  NONE
+</script>

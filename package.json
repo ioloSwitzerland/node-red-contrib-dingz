@@ -31,8 +31,9 @@
   ],
   "node-red": {
     "nodes": {
+      "dingz Config ": "src/dingzConfig.js",
       "dingz Input": "src/dingzInput.js",
-      "dingz Config ": "src/dingzConfig.js"
+      "dingt Output": "src/dingzOutput.js"
     }
   }
 }
