@@ -15,13 +15,14 @@ module.exports = {
   doAsyncCallback: function(resolvedArray, taskJSON, finallyCallback) {
     if (resolvedArray == "error") {
       finallyCallback({ success: false });
+      return;
     } else if (
       resolvedArray == null ||
       resolvedArray[0] == null ||
       resolvedArray[0].length == 0
     ) {
       //NOTHING HAS CHANGED
-      finallyCallback({ success: true, changed: false });
+      finallyCallback({ changed: false });
       return;
     }
 

@@ -18,23 +18,6 @@ module.exports = function(RED) {
       var taskJSON;
       //BUTTON CLICK
       if (!msg.hasOwnProperty("payload")) {
-        if (helpers.getDevice(this.device.mac) == null) {
-          node.status({
-            fill: "red",
-            shape: "ring",
-            text: "dingz unreachable" + helpers.getDateString()
-          });
-
-          node.error(
-            "UNREACHABLE: dingz " +
-              config.name +
-              " with " +
-              this.device.host +
-              "@" +
-              this.device.mac
-          );
-        }
-
         taskJSON = getJsonFromProperty(
           this.device,
           config,
@@ -51,24 +34,26 @@ module.exports = function(RED) {
 
     //CALLBACK
     function back(str) {
-      if (str["success"] == false) {
+      if (str.hasOwnProperty("changed") && !str["changed"]) {
+        node.status({
+          fill: "orange",
+          shape: "ring",
+          text: "Unchanged" + helpers.getDateString()
+        });
+      } else if (!str["success"]) {
         node.error("An error occured while sending");
         node.status({
           fill: "red",
           shape: "ring",
-          text: "dingz unreachable"
+          text: "dingz unreachable" + helpers.getDateString()
         });
-      } else if (str["success"] == true) {
+      } else if (str["success"]) {
         node.status({
           fill: "green",
           shape: "dot",
           text: "Updated" + helpers.getDateString()
         });
       }
-
-      // node.send({
-      //   payload: str
-      // });
     }
 
     function updateDingzState(ip) {
@@ -142,6 +127,10 @@ module.exports = function(RED) {
         request: config.request,
         data: data
       };
+
+      if (config.urlOffset != "" && config.urlOffset != null) {
+        taskJSON.data["urlOffset"] = config.urlOffset;
+      }
 
       if (!requests.isValid(taskJSON, type)) {
         node.error("Conversion from property to json failed");

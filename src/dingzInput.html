@@ -15,6 +15,9 @@
         type: "dingz Config",
         required: true
       },
+      urlOffset: {
+        value: ""
+      },
       advanced: {
         value: false,
       },
@@ -249,6 +252,14 @@
       <option value="report">Report</option>
     </select>
   </div>-->
+
+  <div class="form-row">
+    <label for="node-input-urlOffset"><i class="fa fa-paper-plane"></i>Request</label>
+    <div style="display:inline-block; width:70%;vertical-align:middle ">
+      If you have installed Node-RED at a non standard <br/>URL please enter part of your url that comes after http://&lt;IP&gt; below.<br/>
+      <input type="text" id="node-input-urlOffset" placeholder="offset"></div>
+  </div>
+  </div>
 
   <div class="form-row">
     <label for="node-input-advanced"><i class="fa fa-cog"></i> <span>Config</span></label>
