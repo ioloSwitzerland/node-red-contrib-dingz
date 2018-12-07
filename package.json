@@ -3,17 +3,17 @@
   "version": "0.0.4",
   "description": "dingz nodes to controll all dingz devices within Node-RED",
   "author": "Hadjimina",
-  "homepage": "https://github.com/myStrom/node-red-contrib-mystrom",
+  "homepage": "https://github.com/ioloSwitzerland/node-red-contrib-dingz",
   "license": "Apache-2.0",
   "maintainers": [
     "Philipp Hadjimina <p.m.hadjimina@gmail.com>"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/myStrom/node-red-contrib-mystrom.git"
+    "url": "https://github.com/ioloSwitzerland/node-red-contrib-dingz.git"
   },
   "bugs": {
-    "url": "https://github.com/myStrom/node-red-contrib-mystrom/issues"
+    "url": "https://github.com/ioloSwitzerland/node-red-contrib-dingz/issues"
   },
   "dependencies": {},
   "keywords": [

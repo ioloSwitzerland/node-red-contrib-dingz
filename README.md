@@ -1,9 +1,13 @@
 ![logo](misc/logo.png)
 
+[![npm version](https://badge.fury.io/js/node-red-contrib-dingz.svg)](https://badge.fury.io/js/node-red-contrib-dingz)
+
+[![Packagist](https://img.shields.io/npm/l/node-red-contrib-mystrom.svg?registry_uri=https%3A%2F%2Fregistry.npmjs.com)](https://github.com/ioloSwitzerland/node-red-contrib-dingz/blob/master/LICENSE)
+
 ### Features
 
 - Control nodes via JSON input flows or by simply setting the values in the properties menu
-- [Automatic discovery of dingz devices](#automatic-device-discovery)
+- Automatic discovery of dingz devices
 - Full functionality of the dingz api (TODO)
 - Status message of how the message was sent or if device is reachable
 
@@ -20,10 +24,11 @@ Please report all bugs through the Github issues page. Your help is greatly appr
 ### Nodes
 
 - [dingz Input](#dingz-Input)
+- [dingz Output](#dingz-Output)
 
 ---
 
-#### dingz One
+#### dingz Input
 
 ![](misc/dingzInput.png)
 
