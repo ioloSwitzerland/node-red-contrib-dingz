@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-dingz",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "dingz nodes to controll all dingz devices within Node-RED",
   "author": "Hadjimina",
   "homepage": "https://github.com/myStrom/node-red-contrib-mystrom",
