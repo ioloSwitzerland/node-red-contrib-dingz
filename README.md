@@ -1,14 +1,13 @@
 ![logo](misc/logo.png)
 
-[![npm version](https://badge.fury.io/js/node-red-contrib-dingz.svg)](https://badge.fury.io/js/node-red-contrib-dingz)
+[![Build Status](https://travis-ci.com/ioloSwitzerland/node-red-contrib-dingz.svg?branch=master)](https://travis-ci.com/ioloSwitzerland/node-red-contrib-dingz)[![npm version](https://badge.fury.io/js/node-red-contrib-dingz.svg)](https://badge.fury.io/js/node-red-contrib-dingz)[![dependencies Status](https://david-dm.org/ioloSwitzerland/node-red-contrib-dingz/status.svg)](https://david-dm.org/ioloSwitzerland/node-red-contrib-dingz)[![Packagist](https://img.shields.io/npm/l/node-red-contrib-mystrom.svg?registry_uri=https%3A%2F%2Fregistry.npmjs.com)](https://github.com/ioloSwitzerland/node-red-contrib-dingz/blob/master/LICENSE)
 
-[![Packagist](https://img.shields.io/npm/l/node-red-contrib-mystrom.svg?registry_uri=https%3A%2F%2Fregistry.npmjs.com)](https://github.com/ioloSwitzerland/node-red-contrib-dingz/blob/master/LICENSE)
+[![NPM](https://nodei.co/npm/node-red-contrib-dingz.png?compact=true)](https://nodei.co/npm/node-red-contrib-dingz/)
 
 ### Features
 
 - Control nodes via JSON input flows or by simply setting the values in the properties menu
 - Automatic discovery of dingz devices
-- Full functionality of the dingz api (TODO)
 - Status message of how the message was sent or if device is reachable
 
 ### Installation
@@ -32,5 +31,17 @@ Please report all bugs through the Github issues page. Your help is greatly appr
 
 ![](misc/dingzInput.png)
 
-You can specify which device you are using by selectin the device in the dingz node or specifing it there manually. Done! You can already use your dingz with node-RED!
-If you however want to have even more control you can use the advanced configuration to specify a url and data to be sent once you click your button. If you specify no data, an http get request will be executed other a post request. If you use "wire" as address you will use the normal output of the node.
+Usage:
+
+- Specify dingz Input device by providing ip and mac or using automatic discovery
+- Connect devices to the output ports
+- Press the button on the left side of the dingz input node to upload the configuration to the dingz devices.
+
+#### dingz Output
+
+![](misc/dingzOutput.png)
+
+Usage:
+
+- Specify which output should be set to what value
+- Will run every time it gets any input.

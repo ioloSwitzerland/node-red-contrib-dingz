@@ -190,8 +190,13 @@ module.exports = {
 
           var node = helpers.getNodeForMac()[req.mac];
 
-          node.send(messages);
-          return "executed successfully";
+          if (node != null) {
+            node.send(messages);
+            return "executed successfully";
+          } else {
+            return "error occured while sending: Node not found";
+          }
+
           break;
         }
       }
