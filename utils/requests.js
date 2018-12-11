@@ -27,7 +27,7 @@ module.exports = {
       return;
     }
 
-    var debug = true;
+    var debug = false;
     ip = taskJSON["ip"];
 
     var pathResolved = resolvedArray[0];
@@ -158,13 +158,7 @@ module.exports = {
     if (req.hasOwnProperty("mac") && req.hasOwnProperty("action")) {
       var buttonList = helpers.getWiredList();
 
-      //TODO
-      // console.log(buttonList);
-      // console.log(req);
-
       for (var button of buttonList) {
-        // console.log(button.actions[0][2]);
-        // console.log(req.action);
         if (
           !isNaN(req.action) &&
           !isNaN(req.button) &&

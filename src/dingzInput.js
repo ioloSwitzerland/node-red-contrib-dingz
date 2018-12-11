@@ -166,8 +166,7 @@ module.exports = function(RED) {
   RED.httpAdmin.post("/dingzInput", function(req, res) {
     var request = require("../utils/requests");
     req = req.body;
-    console.log("GOTTEN");
-    console.log(req);
+
     var DEVICE_TYPE = "dingz";
     res.json(request.handleRequest(req, DEVICE_TYPE));
   });
