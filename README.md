@@ -29,7 +29,7 @@ Please report all bugs through the Github issues page. Your help is greatly appr
 
 #### dingz Input
 
-![](misc/dingzInput.png)
+![](misc/dingzInput.PNG)
 
 Usage:
 
@@ -39,7 +39,7 @@ Usage:
 
 #### dingz Output
 
-![](misc/dingzOutput.png)
+![](misc/dingzOutput.PNG)
 
 Usage:
 
