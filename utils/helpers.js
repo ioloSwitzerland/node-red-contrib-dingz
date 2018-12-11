@@ -172,7 +172,9 @@ module.exports = {
     callback,
     finallyCallback
   ) {
+    var startAtOneFlag = true;
     var sendHackFlag = true;
+    var jsonFixFlag = true;
 
     ip = taskJSON["ip"];
     mac = taskJSON["mac"];
@@ -201,7 +203,17 @@ module.exports = {
             });
             res.on("end", () => {
               try {
+                if (!IsJsonString(rawData)) {
+                  if (IsJsonString(rawData + 'eric":""}}')) {
+                    rawData = rawData + 'eric":""}}';
+                  } else if (IsJsonString(rawData + '""}}')) {
+                    rawData = rawData + '""}}';
+                  }
+                }
+                console.log(rawData);
+
                 const parsedData = JSON.parse(rawData);
+
                 //ISNERT HERE
                 var settingURLs = [];
                 var settingPaths = [];
@@ -211,7 +223,12 @@ module.exports = {
                   var settingButtonPaths = [];
 
                   for (var action of buttonInteractions) {
-                    var dingzActor = "btn" + i.toString();
+                    var dingzActor = "btn";
+
+                    dingzActor += startAtOneFlag
+                      ? (i + 1).toString()
+                      : i.toString();
+
                     var resolvedPath = "/" + dingzActor + "/" + action;
                     var currentURL = "";
                     var errorFlag = false;
@@ -285,6 +302,7 @@ module.exports = {
 
                 resolvedData = settingURLs;
                 resolvedPath = settingPaths;
+
                 callback(
                   [resolvedPath, resolvedData],
                   taskJSON,
@@ -430,6 +448,15 @@ function zipToObject(a, b) {
   }
 
   return object;
+}
+
+function IsJsonString(str) {
+  try {
+    JSON.parse(str);
+  } catch (e) {
+    return false;
+  }
+  return true;
 }
 
 function formatMac(mac) {

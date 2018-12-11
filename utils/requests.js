@@ -23,10 +23,11 @@ module.exports = {
     ) {
       //NOTHING HAS CHANGED
       finallyCallback({ changed: false });
+
       return;
     }
 
-    var debug = false;
+    var debug = true;
     ip = taskJSON["ip"];
 
     var pathResolved = resolvedArray[0];
