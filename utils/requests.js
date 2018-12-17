@@ -21,6 +21,7 @@ module.exports = {
       resolvedArray[0] == null ||
       resolvedArray[0].length == 0
     ) {
+      console.log(resolvedArray);
       //NOTHING HAS CHANGED
       finallyCallback({ changed: false });
 
