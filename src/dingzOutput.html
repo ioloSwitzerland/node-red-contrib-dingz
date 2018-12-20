@@ -26,6 +26,9 @@
       },
       outputThree: {
         value: ""
+      },
+      changeDimmerFour: {
+        value: ""
       }
 
     },
@@ -37,27 +40,33 @@
       return this.name || "dingz Output";
     },
     oneditprepare: function() {
-      $('#node-input-outputZero').change(function() {
+      $('#node-input-outputZero').on('input', function() {
         var newVal = $(this).val()
         $('#node-input-outputZero-text').text(newVal + "%");
       });
 
-      $('#node-input-outputOne').change(function() {
+      $('#node-input-outputOne').on('input', function() {
         var newVal = $(this).val()
         $('#node-input-outputOne-text').text(newVal + "%");
       });
 
-      $('#node-input-outputTwo').change(function() {
+      $('#node-input-outputTwo').on('input', function() {
         var newVal = $(this).val()
         $('#node-input-outputTwo-text').text(newVal + "%");
       });
 
-      $('#node-input-outputThree').change(function() {
+      $('#node-input-outputThree').on('input', function() {
         var newVal = $(this).val()
         $('#node-input-outputThree-text').text(newVal + "%");
       });
     }
 
+    //0. tomek: when output 0&1 is shades the /api/v1/dimmer return field with 0, otherwise when output 2&3 are shades return field with 1.
+    //1. check setup of ding (all dimmers, all shades)?
+    //2. Set ui accordingly based of off http://192.168.1.185/api/v1/dimmer
+    //    -- case distinction between 0&1 shades and/or 2&3 shades or none
+    // 3. For each dimmer also possiblity to not send it
+    //    -- checkbox to enable/disable see output 4 for example
 
   });
 </script>
@@ -79,7 +88,7 @@
     <label for="node-input-output0" style="width:70%">
           <input type="range" min="0" max="100" id="node-input-outputZero" style="display:inline-block; width:70%; vertical-align:baseline;"/>
           <div id="node-input-outputZero-text" style="margin-left:22px;display:inline-block;vertical-align:baseline;">
-            100%
+            50%
             </div>
 
       </label>
@@ -91,7 +100,7 @@
     <label for="node-input-output0" style="width:70%">
           <input type="range" min="0" max="100" id="node-input-outputOne" style="display:inline-block; width:70%; vertical-align:baseline;"/>
           <div id="node-input-outputOne-text" style="margin-left:22px;display:inline-block;vertical-align:baseline;">
-            100%
+            50%
             </div>
 
       </label>
@@ -103,7 +112,7 @@
     <label for="node-input-output0" style="width:70%">
           <input type="range" min="0" max="100" id="node-input-outputTwo" style="display:inline-block; width:70%; vertical-align:baseline;"/>
           <div id="node-input-outputTwo-text" style="margin-left:22px;display:inline-block;vertical-align:baseline;">
-            100%
+            50%
             </div>
 
       </label>
@@ -113,10 +122,14 @@
     <label for="node-input-output0"><i class="fa  fa-arrow-right"></i> <span>Output 4</span></label>
 
     <label for="node-input-output0" style="width:70%">
-          <input type="range" min="0" max="100" id="node-input-outputThree" style="display:inline-block; width:70%; vertical-align:baseline;"/>
-          <div id="node-input-outputThree-text" style="margin-left:22px;display:inline-block;vertical-align:baseline;">
-            100%
-            </div>
+      <div>
+          <input type="range" min="0" max="100" id="node-input-outputThree" style="display:inline-block; width:10%; vertical-align:baseline;"/>
+          <div id="node-input-outputThree-text" style="display:inline-block;">
+            50% </div>
+
+            <input type="checkbox" id="node-input-changeDimmerFour" style="display:inline-block;" />
+            <div style="display:inline-block">Don't set</div>
+      </div>
 
       </label>
   </div>
