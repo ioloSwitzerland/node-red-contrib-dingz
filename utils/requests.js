@@ -28,7 +28,7 @@ module.exports = {
       return;
     }
 
-    var debug = true;
+    var debug = false;
     ip = taskJSON["ip"];
 
     var pathResolved = resolvedArray[0];

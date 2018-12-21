@@ -78,7 +78,7 @@ module.exports = {
     server.on("error", err => {
       console.log(`server error:\n${err.stack}`);
       console.log(
-        "If you get the EADDRINUSE error and are using dingz and mystrom nodes togeth you can disregard this"
+        "If you get the EADDRINUSE error and are using dingz and mystrom nodes together you can disregard this"
       );
       server.close();
     });
