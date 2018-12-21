@@ -27,7 +27,41 @@
       outputThree: {
         value: ""
       },
-      changeDimmerFour: {
+      changeDimmerZero: {
+        value: ""
+      },
+      changeDimmerOne: {
+        value: ""
+      },
+      changeDimmerTwo: {
+        value: ""
+      },
+      changeDimmerThree: {
+        value: ""
+
+      },
+      shadeZeroBlind: {
+        value: ""
+      },
+      shadeZeroLamella: {
+        value: ""
+      },
+      shadeOneBlind: {
+        value: ""
+      },
+      shadeOneLamella: {
+        value: ""
+      },
+      changeShadeZero: {
+        value: ""
+      },
+      changeShadeOne: {
+        value: ""
+      },
+      zeroIsShade: {
+        value: ""
+      },
+      oneIsShade: {
         value: ""
       }
 
@@ -40,6 +74,50 @@
       return this.name || "dingz Output";
     },
     oneditprepare: function() {
+
+      console.log(this)
+      //get shades configuration here
+      this.zeroIsShade = false;
+      this.oneIsShade = false;
+
+      if (this.zeroIsShade) {
+        $('#outputZero').hide()
+        $('#outputOne').hide()
+        $('#shadeZero').show()
+      } else {
+        $('#outputZero').show()
+        $('#outputOne').show()
+        $('#shadeZero').hide()
+      }
+
+      if (this.oneIsShade) {
+        $('#outputTwo').hide()
+        $('#outputThree').hide()
+        $('#shadeOne').show()
+      } else {
+        $('#outputTwo').show()
+        $('#outputThree').show()
+        $('#shadeOne').hide()
+
+      }
+
+
+      //Set correct intial text for outputs/dimmers & shades
+      //dimmers
+      $('#node-input-outputZero-text').text($('#node-input-outputZero').val() + "%");
+      $('#node-input-outputOne-text').text($('#node-input-outputOne').val() + "%");
+      $('#node-input-outputTwo-text').text($('#node-input-outputTwo').val() + "%");
+      $('#node-input-outputThree-text').text($('#node-input-outputThree').val() + "%");
+      //shades
+      $('#node-input-shadeZeroBlind-text').html("Blinds: <br>" + $('#node-input-shadeZeroBlind').val() + "%");
+      $('#node-input-shadeZeroLamella-text').html("Lamella: <br>" + $('#node-input-shadeZeroLamella').val() + "%");
+
+      $('#node-input-shadeOneBlind-text').html("Blinds: <br>" + $('#node-input-shadeOneBlind').val() + "%");
+      $('#node-input-shadeOneLamella-text').html("Lamella: <br>" + $('#node-input-shadeOneLamella').val() + "%");
+
+
+      //handles slider changes outputs/dimmer
+      //dimmers
       $('#node-input-outputZero').on('input', function() {
         var newVal = $(this).val()
         $('#node-input-outputZero-text').text(newVal + "%");
@@ -59,10 +137,93 @@
         var newVal = $(this).val()
         $('#node-input-outputThree-text').text(newVal + "%");
       });
+
+      //shades
+      $('#node-input-shadeZeroBlind').on('input', function() {
+        var newVal = $(this).val()
+        $('#node-input-shadeZeroBlind-text').html("Blinds: <br>" + newVal + "%");
+      });
+      $('#node-input-shadeZeroLamella').on('input', function() {
+        var newVal = $(this).val()
+        $('#node-input-shadeZeroLamella-text').html("Lamella: <br>" + newVal + "%");
+      });
+
+      $('#node-input-shadeOneBlind').on('input', function() {
+        var newVal = $(this).val()
+        $('#node-input-shadeOneBlind-text').html("Blinds: <br>" + newVal + "%");
+      });
+      $('#node-input-shadeOneLamella').on('input', function() {
+        var newVal = $(this).val()
+        $('#node-input-shadeOneLamella-text').html("Lamella: <br>" + newVal + "%");
+      });
+
+
+      //Checkbox handling
+      //dimmer
+      $('#node-input-changeDimmerZero').change(function() {
+        if (this.checked) {
+          $('#rangeBlock-dimmerZero').hide()
+        } else {
+          $('#rangeBlock-dimmerZero').show()
+        }
+        $('#node-input-changeDimmerZero').val(this.checked);
+
+      });
+
+      $('#node-input-changeDimmerOne').change(function() {
+        if (this.checked) {
+          $('#rangeBlock-dimmerOne').hide()
+        } else {
+          $('#rangeBlock-dimmerOne').show()
+        }
+        $('#node-input-changeDimmerOne').val(this.checked);
+
+      });
+
+      $('#node-input-changeDimmerTwo').change(function() {
+        if (this.checked) {
+          $('#rangeBlock-dimmerTwo').hide()
+        } else {
+          $('#rangeBlock-dimmerTwo').show()
+        }
+        $('#node-input-changeDimmerTwo').val(this.checked);
+
+      });
+
+      $('#node-input-changeDimmerThree').change(function() {
+        if (this.checked) {
+          $('#rangeBlock-dimmerThree').hide()
+        } else {
+          $('#rangeBlock-dimmerThree').show()
+        }
+        $('#node-input-changeDimmerThree').val(this.checked);
+      });
+
+      //shades
+      $('#node-input-changeShadeZero').change(function() {
+        if (this.checked) {
+          $('#rangeBlock-shadeZero').hide()
+        } else {
+          $('#rangeBlock-shadeZero').show()
+        }
+        $('#node-input-changeShadeZero').val(this.checked);
+      });
+      $('#node-input-changeShadeOne').change(function() {
+        console.log("clicked")
+        if (this.checked) {
+          $('#rangeBlock-shadeOne').hide()
+        } else {
+          $('#rangeBlock-shadeOne').show()
+        }
+        $('#node-input-changeShadeOne').val(this.checked);
+      });
     }
 
+
+
+
     //0. tomek: when output 0&1 is shades the /api/v1/dimmer return field with 0, otherwise when output 2&3 are shades return field with 1.
-    //1. check setup of ding (all dimmers, all shades)?
+    //1. check setup of dingz (all dimmers, all shades)?
     //2. Set ui accordingly based of off http://192.168.1.185/api/v1/dimmer
     //    -- case distinction between 0&1 shades and/or 2&3 shades or none
     // 3. For each dimmer also possiblity to not send it
@@ -82,55 +243,131 @@
     <input id="node-input-device">
   </div>
 
-  <div class="form-row">
-    <label for="node-input-output0"><i class="fa  fa-arrow-right"></i> <span>Output 1</span></label>
 
-    <label for="node-input-output0" style="width:70%">
-          <input type="range" min="0" max="100" id="node-input-outputZero" style="display:inline-block; width:70%; vertical-align:baseline;"/>
-          <div id="node-input-outputZero-text" style="margin-left:22px;display:inline-block;vertical-align:baseline;">
-            50%
+  <div class="form-row" id="shadeZero">
+    <label for="node-input-shadeZero"><i class="fa  fa-arrows-v"></i> <span>Shades 1</span></label>
+
+    <label for="node-input-shadeZero" style="width:70%">
+          <div>
+                  <input type="checkbox" id="node-input-changeShadeZero"  style="vertical-align:middle;width:auto;display:inline-block;" />
+                  <div style="display:inline-block; vertical-align:middle;">Do not change</div>
+          </div>
+          <div id="rangeBlock-shadeZero">
+            <div class="slider-wrapper" style=" display: inline-block;  width:20px;  height: 50px;  padding: 0; margin-top:22px; ">
+              <input type="range" min="0" max="100" id="node-input-shadeZeroBlind" style="width: 50px;  height: 20px;  margin: 0;  transform-origin: 25px 25px;  transform: rotate(-90deg);">
             </div>
 
+            <div id="node-input-shadeZeroBlind-text" style="display:inline-block;margin-left:22px;vertical-align:middle;">
+              Blinds:<br> 50%
+            </div>
+
+              <div class="slider-wrapper" style=" display: inline-block;  width:20px;  height: 50px;  padding: 0; margin-top:22px; ">
+                <input type="range" min="0" max="100" id="node-input-shadeZeroLamella" style="width: 50px;  height: 20px;  margin: 0;  transform-origin: 25px 25px;  transform: rotate(-90deg);">
+              </div>
+
+              <div id="node-input-shadeZeroLamella-text" style="display:inline-block;margin-left:22px;vertical-align:middle;">
+                Lamella orientation:<br> 50%
+              </div>
+
+
+          </div>
       </label>
   </div>
 
-  <div class="form-row">
-    <label for="node-input-output0"><i class="fa  fa-arrow-right"></i> <span>Output 2</span></label>
+  <div class="form-row" id="outputZero">
+    <label for="node-input-outputZero"><i class="fa  fa-arrow-right"></i> <span>Output 1</span></label>
 
-    <label for="node-input-output0" style="width:70%">
-          <input type="range" min="0" max="100" id="node-input-outputOne" style="display:inline-block; width:70%; vertical-align:baseline;"/>
-          <div id="node-input-outputOne-text" style="margin-left:22px;display:inline-block;vertical-align:baseline;">
-            50%
-            </div>
-
+    <label for="node-input-outputZero" style="width:70%">
+          <div>
+                  <input type="checkbox" id="node-input-changeDimmerZero"  style="vertical-align:middle;width:auto;display:inline-block;" />
+                  <div style="display:inline-block; vertical-align:middle;">Do not change</div>
+          </div>
+          <div id="rangeBlock-dimmerZero">
+            <input type="range" min="0" max="100" id="node-input-outputZero" >
+            <div id="node-input-outputZero-text" style="display:inline-block;margin-left:22px;vertical-align:middle;">
+              50% </div>
+          </div>
       </label>
   </div>
 
-  <div class="form-row">
-    <label for="node-input-output0"><i class="fa  fa-arrow-right"></i> <span>Output 3</span></label>
+  <div class="form-row" id="outputOne">
 
-    <label for="node-input-output0" style="width:70%">
-          <input type="range" min="0" max="100" id="node-input-outputTwo" style="display:inline-block; width:70%; vertical-align:baseline;"/>
-          <div id="node-input-outputTwo-text" style="margin-left:22px;display:inline-block;vertical-align:baseline;">
-            50%
+    <label for="node-input-outputOne"><i class="fa  fa-arrow-right"></i> <span>Output 2</span></label>
+
+    <label for="node-input-outputOne" style="width:70%">
+          <div>
+                  <input type="checkbox" id="node-input-changeDimmerOne"  style="vertical-align:middle;width:auto;display:inline-block;" />
+                  <div style="display:inline-block; vertical-align:middle;">Do not change</div>
+          </div>
+          <div id="rangeBlock-dimmerOne">
+            <input type="range" min="0" max="100" id="node-input-outputOne" >
+            <div id="node-input-outputOne-text" style="display:inline-block;margin-left:22px;vertical-align:middle;">
+              50% </div>
+          </div>
+      </label>
+
+  </div>
+
+
+  <div class="form-row" id="shadeOne">
+    <label for="node-input-shadeOne"><i class="fa  fa-arrows-v"></i> <span>Shades 2</span></label>
+
+    <label for="node-input-shadeOne" style="width:70%">
+          <div>
+                  <input type="checkbox" id="node-input-changeShadeOne"  style="vertical-align:middle;width:auto;display:inline-block;" />
+                  <div style="display:inline-block; vertical-align:middle;">Do not change</div>
+          </div>
+          <div id="rangeBlock-shadeOne">
+            <div class="slider-wrapper" style=" display: inline-block;  width:20px;  height: 50px;  padding: 0; margin-top:22px; ">
+              <input type="range" min="0" max="100" id="node-input-shadeOneBlind" style="width: 50px;  height: 20px;  margin: 0;  transform-origin: 25px 25px;  transform: rotate(-90deg);">
             </div>
 
+            <div id="node-input-shadeOneBlind-text" style="display:inline-block;margin-left:22px;vertical-align:middle;">
+              Blinds:<br> 50%
+            </div>
+
+              <div class="slider-wrapper" style=" display: inline-block;  width:20px;  height: 50px;  padding: 0; margin-top:22px; ">
+                <input type="range" min="0" max="100" id="node-input-shadeOneLamella" style="width: 50px;  height: 20px;  margin: 0;  transform-origin: 25px 25px;  transform: rotate(-90deg);">
+              </div>
+
+              <div id="node-input-shadeOneLamella-text" style="display:inline-block;margin-left:22px;vertical-align:middle;">
+                Lamella orientation:<br> 50%
+              </div>
+
+
+          </div>
       </label>
   </div>
 
-  <div class="form-row">
-    <label for="node-input-output0"><i class="fa  fa-arrow-right"></i> <span>Output 4</span></label>
+  <div class="form-row" id="outputTwo">
+    <label for="node-input-outputTwo"><i class="fa  fa-arrow-right"></i> <span>Output 3</span></label>
 
-    <label for="node-input-output0" style="width:70%">
+    <label for="node-input-outputTwo" style="width:70%">
       <div>
-          <input type="range" min="0" max="100" id="node-input-outputThree" style="display:inline-block; width:10%; vertical-align:baseline;"/>
-          <div id="node-input-outputThree-text" style="display:inline-block;">
-            50% </div>
-
-            <input type="checkbox" id="node-input-changeDimmerFour" style="display:inline-block;" />
-            <div style="display:inline-block">Don't set</div>
+        <input type="checkbox" id="node-input-changeDimmerTwo" style="vertical-align:middle;width:auto;display:inline-block;" />
+        <div style="display:inline-block; vertical-align:middle;">Do not change</div>
       </div>
+      <div id="rangeBlock-dimmerTwo">
+        <input type="range" min="0" max="100" id="node-input-outputTwo">
+        <div id="node-input-outputTwo-text" style="display:inline-block;margin-left:22px;vertical-align:middle;">
+          50% </div>
+      </div>
+      </label>
+  </div>
 
+  <div class="form-row" id="outputThree">
+    <label for="node-input-outputThree"><i class="fa  fa-arrow-right"></i> <span>Output 4</span></label>
+
+    <label for="node-input-outputThree" style="width:70%">
+          <div>
+                  <input type="checkbox" id="node-input-changeDimmerThree"  style="vertical-align:middle;width:auto;display:inline-block;" />
+                  <div style="display:inline-block; vertical-align:middle;">Do not change</div>
+          </div>
+          <div id="rangeBlock-dimmerThree">
+            <input type="range" min="0" max="100" id="node-input-outputThree" >
+            <div id="node-input-outputThree-text" style="display:inline-block;margin-left:22px;vertical-align:middle;">
+              50% </div>
+          </div>
       </label>
   </div>
 

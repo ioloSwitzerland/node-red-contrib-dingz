@@ -25,15 +25,43 @@ module.exports = function(RED) {
         taskJSON = {
           ip: this.device.host,
           mac: this.device.mac,
-          request: config.request != "output" ? "output" : config.request,
-          data: {
-            outputZero: config.outputZero,
-            outputOne: config.outputOne,
-            outputTwo: config.outputTwo,
-            outputThree: config.outputThree
-          }
+          request: config.request != "output" ? "output" : config.request
         };
 
+        var data = {};
+        if (!config.zeroIsShade) {
+          if (!config.changeDimmerZero) {
+            data.outputZero = config.outputZero;
+          }
+          if (!config.changeDimmerOne) {
+            data.outputOne = config.outputOne;
+          }
+        } else {
+          if (!config.changeShadeZero) {
+            data["shadeZero"] = {
+              blind: config.shadeZeroBlind,
+              lamella: config.shadeZeroLamella
+            };
+          }
+        }
+
+        if (!config.oneIsShade) {
+          if (!config.changeDimmerTwo) {
+            data.outputTwo = config.outputTwo;
+          }
+          if (!config.changeDimmerThree) {
+            data.outputThree = config.outputThree;
+          }
+        } else {
+          if (!config.changeShadeOne) {
+            data["shadeOne"] = {
+              blind: config.shadeOneBlind,
+              lamella: config.shadeOneLamella
+            };
+          }
+        }
+
+        taskJSON.data = data;
         this.status({
           fill: "yellow",
           shape: "ring",

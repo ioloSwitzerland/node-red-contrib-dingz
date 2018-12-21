@@ -303,10 +303,31 @@ module.exports = {
         //4 = amount of dimmer inputs
         var settingData = [];
         var settingPath = [];
-        for (var i = 0; i < dimmerText.length; i++) {
-          var dummyData = "dummy";
-          var outValue = data["output" + dimmerText[i]];
-          var path = "/api/v1/dimmer/" + i.toString() + "/on?value=" + outValue;
+        var keys = Object.keys(taskJSON.data);
+        var dummyData = "dummy";
+        var path = "";
+
+        for (var i = 0; i < keys.length; i++) {
+          if (keys[i].includes("output")) {
+            var outValue = data[keys[i]];
+            var path =
+              "/api/v1/dimmer/" +
+              module.exports.stringContainsNumber(keys[i]).toString() +
+              "/on?value=" +
+              outValue;
+          } else if (keys[i].includes("shade")) {
+            var blind = data[keys[i]].blind;
+            var lamella = data[keys[i]].lamella;
+
+            var path =
+              "/api/v1/shade/" +
+              module.exports.stringContainsNumber(keys[i]).toString() +
+              "?blind=" +
+              blind +
+              "&lamella=" +
+              lamella;
+            outValue;
+          }
           settingData.push(dummyData);
           settingPath.push(path);
         }
@@ -390,7 +411,31 @@ module.exports = {
     }
     return null;
   },
+  stringContainsNumber: function(str) {
+    str = str.toLowerCase();
 
+    if (str.includes("zero")) {
+      return 0;
+    } else if (str.includes("one")) {
+      return 1;
+    } else if (str.includes("two")) {
+      return 2;
+    } else if (str.includes("three")) {
+      return 3;
+    } else if (str.includes("four")) {
+      return 4;
+    } else if (str.includes("five")) {
+      return 5;
+    } else if (str.includes("six")) {
+      return 6;
+    } else if (str.includes("seven")) {
+      return 7;
+    } else if (str.includes("eight")) {
+      return 8;
+    } else if (str.includes("nine")) {
+      return 9;
+    }
+  },
   getDateString: function() {
     var date = new Date();
     const monthNames = [

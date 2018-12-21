@@ -28,7 +28,7 @@ module.exports = {
       return;
     }
 
-    var debug = false;
+    var debug = true;
     ip = taskJSON["ip"];
 
     var pathResolved = resolvedArray[0];
@@ -111,7 +111,14 @@ module.exports = {
           var hasTwo = json.data.hasOwnProperty("outputTwo");
           var hasThree = json.data.hasOwnProperty("outputThree");
 
-          return hasZero && hasOne && hasTwo && hasThree && basics;
+          var hasShadeZero = json.data.hasOwnProperty("shadeZero");
+          var hasShadeOne = json.data.hasOwnProperty("shadeOne");
+
+          return (
+            basics &&
+            (!hasShadeZero || (!hasZero && !hasOne)) &&
+            (!hasShadeOne || (!hasTwo && !hasThree))
+          );
         }
       } else if (json["request"] == "set") {
         var isValid = true;
