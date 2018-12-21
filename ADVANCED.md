@@ -32,12 +32,21 @@ The elements which are valid options for the request field and data field are sp
 | :------------- | :----- | :------------------ |
 | `output`       | string | Turns the switch on |
 
-| Valid data object | Type       | Description                        |
-| :---------------- | :--------- | :--------------------------------- |
-| outputZero        | int 0..100 | The new value of the first output  |
-| outputOne         | int 0..100 | The new value of the second output |
-| outputTwo         | int 0..100 | The new value of the third output  |
-| outputThree       | int 0..100 | The new value of the forth output  |
+| Valid data object | Type         | Description                                        |
+| :---------------- | :----------- | :------------------------------------------------- |
+| outputZero        | int 0..100   | The new value of the first output                  |
+| outputOne         | int 0..100   | The new value of the second output                 |
+| outputTwo         | int 0..100   | The new value of the third output                  |
+| outputThree       | int 0..100   | The new value of the forth output                  |
+| shadeZero         | shade object | The new shade setting. see below for its structure |
+| shadeOne          | shade object | The new shade setting. see below for its structure |
+
+| Valid shade object | Type       | Description                                 |
+| :----------------- | :--------- | :------------------------------------------ |
+| blind              | int 0..100 | How much you want the blinds to close in %  |
+| lamella            | int 0..100 | How much you want the lamella to close in % |
+
+In the data object we can have any combination of fields except when we are also using shades. Since shades connect to the back of the dingz where you normally but outputs this means that if you are using the `shadeZero` you cannot use outputZero or output One and similarly when using `shadeOne` you cannot use the outputTwo and outputThree.
 
 ##### Examples
 
@@ -54,3 +63,19 @@ We want to set the first output to 50%, the second to 0%, the third to 100% and 
           "outputThree": 80
         }
       }
+
+We want to set the first shade connected to outputs 0 & 1 to be completely closed and the lamella should be 50% closed while the remaining two outputs should be at 100%:
+
+    { "ip": "192.168.1.00",
+      "mac": "00:00:00:00:00:00"
+      "request":  "output"
+      "data":
+      {
+        "shadeZero":{
+          "blind": 100,
+          "lamella":"50"
+        }
+        "outputTwo": 100,
+        "outputThree": 100
+      }
+    }
